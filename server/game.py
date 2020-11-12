@@ -389,7 +389,7 @@ class OvercookedGame(Game):
         self.max_players = int(num_players)
         self.mdp = None
         self.mp = None
-        self.score = 0
+        self.score = self._get_initial_score()
         self.phi = 0
         self.max_time = min(int(gameTime), MAX_GAME_TIME)
         self.npc_policies = {}
@@ -425,6 +425,14 @@ class OvercookedGame(Game):
 
     def _curr_game_over(self):
         return time() - self.start_time >= self.max_time
+
+    def _get_initial_score(self):
+        return 0
+
+    def _update_score(self, reward_per_agent):
+        print('REWARD PER AGENT: [{}]'.format(', '.join(map(str, reward_per_agent))))
+        curr_reward = sum(reward_per_agent)
+        self.score += curr_reward
 
 
     def needs_reset(self):
@@ -502,9 +510,8 @@ class OvercookedGame(Game):
             for npc_id in self.npc_policies:
                 self.npc_state_queues[npc_id].put(self.state, block=False)
 
-        # Update score based on soup deliveries that might have occured
-        curr_reward = sum(info['sparse_reward_by_agent'])
-        self.score += curr_reward
+        # Update score based on soup deliveries that might have occurred
+        self._update_score(info['sparse_reward_by_agent'])
 
         # Return about the current transition
         return prev_state, joint_action, info
@@ -541,7 +548,7 @@ class OvercookedGame(Game):
             self.phi = self.mdp.potential_function(self.state, self.mp, gamma=0.99)
         self.start_time = time()
         self.curr_tick = 0
-        self.score = 0
+        self.score = self._get_initial_score()
         self.threads = []
         for npc_policy in self.npc_policies:
             self.npc_policies[npc_policy].reset()
@@ -598,6 +605,16 @@ class OvercookedGame(Game):
                     return pickle.load(f)
             except Exception as e:
                 raise IOError("Error loading agent\n{}".format(e.__repr__()))
+
+
+class CompetitiveOvercooked(OvercookedGame):
+    def _get_initial_score(self):
+        return [0] * self.max_players
+
+    def _update_score(self, reward_per_agent):
+        print('REWARD PER AGENT: [{}]'.format(', '.join(map(str, reward_per_agent))))
+        for index in range(0, len(reward_per_agent)):
+            self.score[index] += reward_per_agent[index]
 
 
 class OvercookedPsiturk(OvercookedGame):

@@ -11,7 +11,7 @@ from threading import Lock
 from utils import ThreadSafeSet, ThreadSafeDict
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, join_room, leave_room, emit
-from game import OvercookedGame, OvercookedTutorial, Game, OvercookedPsiturk
+from game import OvercookedGame, OvercookedTutorial, Game, OvercookedPsiturk, CompetitiveOvercooked
 import game
 
 
@@ -86,7 +86,7 @@ USER_ROOMS = ThreadSafeDict()
 
 # Mapping of string game names to corresponding classes
 GAME_NAME_TO_CLS = {
-    "overcooked" : OvercookedGame,
+    "overcooked" : CompetitiveOvercooked,
     "tutorial" : OvercookedTutorial,
     "psiturk" : OvercookedPsiturk
 }
