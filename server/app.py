@@ -11,7 +11,7 @@ from threading import Lock
 from utils import ThreadSafeSet, ThreadSafeDict
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, join_room, leave_room, emit
-from game import OvercookedGame, OvercookedTutorial, Game, OvercookedPsiturk, CompetitiveOvercooked
+from game import OvercookedGame, OvercookedTutorial, Game, CompetitiveOvercooked, OvercookedLITW
 import game
 
 
@@ -51,11 +51,11 @@ MAX_GAMES = CONFIG['MAX_GAMES']
 # Frames per second cap for serving to client
 MAX_FPS = CONFIG['MAX_FPS']
 
-# Default configuration for psiturk experiment
-PSITURK_CONFIG = json.dumps(CONFIG['psiturk'])
-
 # Default configuration for tutorial
 TUTORIAL_CONFIG = json.dumps(CONFIG['tutorial'])
+
+# Default configuration for the MORALAI LITW study
+LITW_CONFIG = json.dumps(CONFIG['litw'])
 
 # Global queue of available IDs. This is how we synch game creation and keep track of how many games are in memory
 FREE_IDS = queue.Queue(maxsize=MAX_GAMES)
@@ -88,7 +88,7 @@ USER_ROOMS = ThreadSafeDict()
 GAME_NAME_TO_CLS = {
     "overcooked" : CompetitiveOvercooked,
     "tutorial" : OvercookedTutorial,
-    "psiturk" : OvercookedPsiturk
+    "litw" : OvercookedLITW
 }
 
 game._configure(MAX_GAME_LENGTH, AGENT_DIR)
@@ -110,7 +110,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", logger=app.config['DEBUG'])
 # Attach handler for logging errors to file
 handler = logging.FileHandler(LOGFILE)
 handler.setLevel(logging.ERROR)  
-app.logger.addHandler(handler)  
+app.logger.addHandler(handler)
 
 
 #################################
@@ -251,8 +251,6 @@ def  _leave_game(user_id):
         elif was_active and not game.is_empty():
             # Active -> Waiting
             game.deactivate()
-            
-            
 
     return was_active
 
@@ -334,26 +332,14 @@ def get_agent_names():
 # Hitting each of these endpoints creates a brand new socket that is closed 
 # at after the server response is received. Standard HTTP protocol
 
-@app.route('/')
+@app.route('/play')
 def index():
     agent_names = get_agent_names()
     return render_template('index.html', agent_names=agent_names, layouts=LAYOUTS)
 
-@app.route('/psiturk')
-def psiturk():
-    uid = request.args.get("UID")
-    psiturk_config = request.args.get('config', PSITURK_CONFIG)
-    return render_template('psiturk.html', uid=uid, config=psiturk_config)
-
-@app.route('/instructions')
-def instructions():
-    psiturk = request.args.get('psiturk', False)
-    return render_template('instructions.html', layout_conf=LAYOUT_GLOBALS, psiturk=psiturk)
-
-@app.route('/tutorial')
-def tutorial():
-    psiturk = request.args.get('psiturk', False)
-    return render_template('tutorial.html', config=TUTORIAL_CONFIG, psiturk=psiturk)
+@app.route('/litw')
+def litw():
+    return render_template('litw.html', config=LITW_CONFIG)
 
 @app.route('/debug')
 def debug():
@@ -464,6 +450,7 @@ def on_join(data):
                     WAITING_GAMES.put(game.id)
                     emit('waiting', { "in_game" : True }, room=game.id)
 
+
 @socketio.on('leave')
 def on_leave(data):
     user_id = request.sid
@@ -474,6 +461,7 @@ def on_leave(data):
             emit('end_game', { "status" : Game.Status.DONE, "data" : {}})
         else:
             emit('end_lobby')
+
 
 @socketio.on('action')
 def on_action(data):
@@ -496,6 +484,7 @@ def on_connect():
 
     USERS[user_id] = Lock()
 
+
 @socketio.on('disconnect')
 def on_disconnect():
     # Ensure game data is properly cleaned-up in case of unexpected disconnect
@@ -506,8 +495,6 @@ def on_disconnect():
         _leave_game(user_id)
 
     del USERS[user_id]
-
-
 
 
 # Exit handler for server

@@ -421,7 +421,6 @@ class OvercookedGame(Game):
             self.add_player(player_one_id, idx=1, buff_size=1, is_human=False)
             self.npc_policies[player_one_id] = self.get_policy(playerOne, idx=1)
             self.npc_state_queues[player_one_id] = LifoQueue()
-        
 
     def _curr_game_over(self):
         return time() - self.start_time >= self.max_time
@@ -430,10 +429,8 @@ class OvercookedGame(Game):
         return 0
 
     def _update_score(self, reward_per_agent):
-        print('REWARD PER AGENT: [{}]'.format(', '.join(map(str, reward_per_agent))))
         curr_reward = sum(reward_per_agent)
         self.score += curr_reward
-
 
     def needs_reset(self):
         return self._curr_game_over() and not self.is_finished()
@@ -455,7 +452,6 @@ class OvercookedGame(Game):
             else:
                 raise ValueError("Inconsistent state")
 
-
     def npc_policy_consumer(self, policy_id):
         queue = self.npc_state_queues[policy_id]
         policy = self.npc_policies[policy_id]
@@ -463,7 +459,6 @@ class OvercookedGame(Game):
             state = queue.get()
             npc_action, _ = policy.action(state)
             super(OvercookedGame, self).enqueue_action(policy_id, npc_action)
-
 
     def is_full(self):
         return self.num_players >= self.max_players
@@ -515,7 +510,6 @@ class OvercookedGame(Game):
 
         # Return about the current transition
         return prev_state, joint_action, info
-        
 
     def enqueue_action(self, player_id, action):
         overcooked_action = self.action_to_overcooked_action[action]
@@ -526,7 +520,6 @@ class OvercookedGame(Game):
         if status == self.Status.RESET:
             # Hacky way of making sure game timer doesn't "start" until after reset timeout has passed
             self.start_time += self.reset_timeout / 1000
-
 
     def tick(self):
         self.curr_tick += 1
@@ -570,7 +563,6 @@ class OvercookedGame(Game):
         # Clear all action queues
         self.clear_pending_actions()
 
-
     def get_state(self):
         state_dict = {}
         state_dict['potential'] = self.phi if self.show_potential else None
@@ -612,74 +604,9 @@ class CompetitiveOvercooked(OvercookedGame):
         return [0] * self.max_players
 
     def _update_score(self, reward_per_agent):
-        print('REWARD PER AGENT: [{}]'.format(', '.join(map(str, reward_per_agent))))
         for index in range(0, len(reward_per_agent)):
             self.score[index] += reward_per_agent[index]
-
-
-class OvercookedPsiturk(OvercookedGame):
-    """
-    Wrapper on OvercookedGame that handles additional housekeeping for Psiturk experiments
-
-    Instance Variables:
-        - trajectory (list(dict)): list of state-action pairs in current trajectory
-        - psiturk_uid (string): Unique id for each psiturk game instance (provided by Psiturk backend)
-            Note, this is not the user id -- two users in the same game will have the same psiturk_uid
-        - trial_id (string): Unique identifier for each psiturk trial, updated on each call to reset
-            Note, one OvercookedPsiturk game handles multiple layouts. This is how we differentiate
-
-    Methods:
-        get_data: Returns the accumulated trajectory data and clears the self.trajectory instance variable
-    
-    """
-
-    def __init__(self, *args, psiturk_uid='-1', **kwargs):
-        super(OvercookedPsiturk, self).__init__(*args, showPotential=False, **kwargs)
-        self.psiturk_uid = psiturk_uid
-        self.trajectory = []
-
-    def activate(self):
-        """
-        Resets trial ID at start of new "game"
-        """
-        super(OvercookedPsiturk, self).activate()
-        self.trial_id = self.psiturk_uid + str(self.start_time)
-
-    def apply_actions(self):
-        """
-        Applies pending actions then logs transition data
-        """
-        # Apply MDP logic
-        prev_state, joint_action, info = super(OvercookedPsiturk, self).apply_actions()
-
-        # Log data to send to psiturk client
-        curr_reward = sum(info['sparse_reward_by_agent'])
-        transition = {
-            "state" : json.dumps(prev_state.to_dict()),
-            "joint_action" : json.dumps(joint_action),
-            "reward" : curr_reward,
-            "time_left" : max(self.max_time - (time() - self.start_time), 0),
-            "score" : self.score,
-            "time_elapsed" : time() - self.start_time,
-            "cur_gameloop" : self.curr_tick,
-            "layout" : json.dumps(self.mdp.terrain_mtx),
-            "layout_name" : self.curr_layout,
-            "trial_id" : self.trial_id,
-            "player_0_id" : self.players[0],
-            "player_1_id" : self.players[1],
-            "player_0_is_human" : self.players[0] in self.human_players,
-            "player_1_is_human" : self.players[1] in self.human_players
-        }
-
-        self.trajectory.append(transition)
-
-    def get_data(self):
-        """
-        Returns and then clears the accumulated trajectory
-        """
-        data = { "uid" : self.psiturk_uid  + "_" + str(time()), "trajectory" : self.trajectory }
-        self.trajectory = []
-        return data
+        #print('SCORE PER AGENT: [{}]'.format(', '.join(map(str, self.score))))
 
 
 class OvercookedTutorial(OvercookedGame):
@@ -691,7 +618,6 @@ class OvercookedTutorial(OvercookedGame):
         - curr_phase (int): Indicates what tutorial phase we are currently on
         - phase_two_score (float): The exact sparse reward the user must obtain to advance past phase 2
     """
-    
 
     def __init__(self, layouts=["tutorial_0"], mdp_params={}, playerZero='human', playerOne='AI', phaseTwoScore=15, **kwargs):
         super(OvercookedTutorial, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero, playerOne=playerOne, showPotential=False, **kwargs)
@@ -743,7 +669,38 @@ class OvercookedTutorial(OvercookedGame):
                 self.phase_two_finished = True
 
 
+class OvercookedLITW(CompetitiveOvercooked):
+    """
+    Wrapper on OvercookedGame that includes additional data for the MORAL_AI LITW study mechanics
+    """
 
+    def __init__(self, layouts=["tutorial_0"], mdp_params={}, playerZero='human', playerOne='AI', **kwargs):
+        super(OvercookedLITW, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
+                                                 playerOne=playerOne, showPotential=False, **kwargs)
+        self.phase_two_finished = False
+        self.max_time = 0
+        self.max_players = 2
+        self.ticks_per_ai_action = 8
+        self.curr_phase = 0
+
+    @property
+    def reset_timeout(self):
+        return 1
+
+    def needs_reset(self):
+        if self.curr_phase == 0:
+            return self.score[0] > 0
+        else:
+            return super(OvercookedGame, self).needs_reset()
+
+    def reset(self):
+        print("RESET: {}".format(self.curr_phase))
+        self.max_time = 30
+        super(OvercookedLITW, self).reset()
+        self.curr_phase += 1
+
+    def get_policy(self, *args, **kwargs):
+        return TutorialAI()
 
 
 class DummyOvercookedGame(OvercookedGame):
@@ -903,5 +860,3 @@ class TutorialAI():
     def reset(self):
         self.curr_tick = -1
         self.curr_phase += 1
-
-    

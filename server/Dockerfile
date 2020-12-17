@@ -8,6 +8,8 @@ ARG GRAPHICS
 WORKDIR /app
 
 # Install non-chai dependencies
+
+RUN pip install tensorflow==2.3.1 --no-cache-dir
 COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
