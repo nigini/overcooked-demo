@@ -1,8 +1,5 @@
 // Persistent network connection that will be used to transmit real-time data
 var socket = io();
-
-
-
 var config;
 
 var tutorial_instructions = () => [
@@ -49,7 +46,8 @@ var tutorial_hints = () => [
     `
 ]
 
-var curr_tutorial_phase;
+let curr_study_phase = 0;
+let study_phases = ['tutorial', 'mai_left'];
 
 // Read in game config provided by server
 $(function() {
@@ -66,8 +64,8 @@ $(function() {
 $(function() {
     $('#try-again').click(function () {
         data = {
-            "params" : config['litwParams'],
-            "game_name" : "litw"
+            "params" : config['tutorial'],
+            "game_name" : "litw_tutorial"
         };
         socket.emit("join", data);
         $('try-again').attr("disable", true);
@@ -113,8 +111,13 @@ socket.on('creation_failed', function(data) {
     $('#try-again').attr("disabled", false);
 });
 
+socket.on("connect", function() {
+    let game_data = get_game_config();
+    socket.emit("join", game_data);
+});
+
 socket.on('start_game', function(data) {
-    curr_tutorial_phase = 0;
+    console.log(`STARTING GAME: ${JSON.stringify(data)}`);
     graphics_config = {
         container_id : "overcooked",
         start_info : data.start_info
@@ -125,48 +128,53 @@ socket.on('start_game', function(data) {
     $('#try-again').attr('disabled', true)
     $('#hint-wrapper').hide();
     $('#show-hint').text('Show Hint');
-    $('#game-title').text(`Study Progress, Phase ${curr_tutorial_phase + 1}/${tutorial_instructions.length}`);
+    $('#game-title').text(`Study Progress, Phase ${curr_study_phase + 1}/${tutorial_instructions.length}`);
     $('#game-title').show();
-    $('#tutorial-instructions').append(tutorial_instructions[curr_tutorial_phase]);
+    $('#tutorial-instructions').append(tutorial_instructions[curr_study_phase]);
     $('#instructions-wrapper').show();
-    $('#hint').append(tutorial_hints[curr_tutorial_phase]);
+    $('#hint').append(tutorial_hints[curr_study_phase]);
     enable_key_listener();
     graphics_start(graphics_config);
 });
 
 socket.on('reset_game', function(data) {
-    curr_tutorial_phase++;
+    console.log(`RESET GAME: ${JSON.stringify(data)}`);
+    curr_study_phase++;
     graphics_end();
     disable_key_listener();
     $("#overcooked").empty();
     $('#tutorial-instructions').empty();
     $('#hint').empty();
-    $("#tutorial-instructions").append(tutorial_instructions[curr_tutorial_phase]);
-    $("#hint").append(tutorial_hints[curr_tutorial_phase]);
-    $('#game-title').text(`Study Progress, Phase ${curr_tutorial_phase + 1}/${tutorial_instructions.length}`);
-    
-    let button_pressed = $('#show-hint').text() === 'Hide Hint';
-    if (button_pressed) {
-        $('#show-hint').click();
+
+    if(curr_study_phase < study_phases.length) {
+        $("#tutorial-instructions").append(tutorial_instructions[curr_study_phase]);
+        $("#hint").append(tutorial_hints[curr_study_phase]);
+        $('#game-title').text(`Study Progress, Phase ${curr_study_phase + 1}/${tutorial_instructions.length}`);
+        let button_pressed = $('#show-hint').text() === 'Hide Hint';
+        if (button_pressed) {
+            $('#show-hint').click();
+        }
+        let game_config = get_game_config();
+        socket.emit("join", game_config);
+    } else {
+        end_study(data)
     }
-    graphics_config = {
-        container_id : "overcooked",
-        start_info : data.state
-    };
-    console.log(`STUDY phase #${curr_tutorial_phase}! CONFIG: ${JSON.stringify(data.state)}.`);
-    graphics_start(graphics_config);
-    enable_key_listener();
 });
 
 socket.on('state_pong', function(data) {
-    // Draw state update
     let cur_state = data['state'];
     delete cur_state['all_orders'];
     delete cur_state['bonus_orders'];
     drawState(cur_state);
 });
 
-socket.on('end_game', function(data) {
+socket.on('end_game', function (data){
+    end_study(data);
+});
+
+function end_study(data) {
+    console.log(`ENDING GAME: ${JSON.stringify(data)}`);
+
     // Hide game data and display game-over html
     graphics_end();
     disable_key_listener();
@@ -176,7 +184,7 @@ socket.on('end_game', function(data) {
     $('#show-hint').hide();
     $('#game-over').show();
     $('#quit').hide();
-    
+
     if (data.status === 'inactive') {
         // Game ended unexpectedly
         $('#error-exit').show();
@@ -188,8 +196,21 @@ socket.on('end_game', function(data) {
     }
 
     $('#finish').show();
-});
+}
 
+function get_game_config() {
+    let game_config = null;
+    if(curr_study_phase < study_phases.length){
+        let stored_config = config[study_phases[curr_study_phase]];
+        let game_name = stored_config['game_name'];
+        delete stored_config['game_name'];
+        game_config = {
+            "params": stored_config,
+            "game_name": game_name
+        }
+    }
+    return game_config;
+}
 
 /* * * * * * * * * * * * * * 
  * Game Key Event Listener *
@@ -230,21 +251,6 @@ function enable_key_listener() {
 function disable_key_listener() {
     $(document).off('keydown');
 };
-
-/* * * * * * * * * * * * 
- * Game Initialization *
- * * * * * * * * * * * */
-
-socket.on("connect", function() {
-    // Config for this specific game
-    let data = {
-        "params" : config['litwParams'],
-        "game_name" : "litw"
-    };
-
-    // create (or join if it exists) new game
-    socket.emit("join", data);
-});
 
 
 /* * * * * * * * * * *

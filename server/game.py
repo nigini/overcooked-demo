@@ -3,7 +3,6 @@ from threading import Lock, Thread
 from queue import Queue, LifoQueue, Empty, Full
 from time import time
 from overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld
-from overcooked_ai_py.mdp.overcooked_env import OvercookedEnv
 from overcooked_ai_py.mdp.actions import Action, Direction
 from overcooked_ai_py.planning.planners import MotionPlanner, NO_COUNTERS_PARAMS
 from human_aware_rl.rllib.rllib import load_agent
@@ -20,6 +19,7 @@ def _configure(max_game_time, agent_dir):
     global AGENT_DIR, MAX_GAME_TIME
     MAX_GAME_TIME = max_game_time
     AGENT_DIR = agent_dir
+
 
 class Game(ABC):
 
@@ -287,7 +287,6 @@ class Game(ABC):
         """
         return {}
         
-
 
 class DummyGame(Game):
 
@@ -669,38 +668,56 @@ class OvercookedTutorial(OvercookedGame):
                 self.phase_two_finished = True
 
 
-class OvercookedLITW(CompetitiveOvercooked):
+class LITWTutorial(CompetitiveOvercooked):
     """
     Wrapper on OvercookedGame that includes additional data for the MORAL_AI LITW study mechanics
     """
 
     def __init__(self, layouts=["tutorial_0"], mdp_params={}, playerZero='human', playerOne='AI', **kwargs):
-        super(OvercookedLITW, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
+        super(LITWTutorial, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
                                                  playerOne=playerOne, showPotential=False, **kwargs)
-        self.phase_two_finished = False
         self.max_time = 0
         self.max_players = 2
         self.ticks_per_ai_action = 8
-        self.curr_phase = 0
+
+    @property
+    def reset_timeout(self):
+        return 1
+
+    def _curr_game_over(self):
+        return self.score[0] > 0
+
+    def reset(self):
+        print("RESET TUTORIAL!")
+
+    def get_policy(self, *args, **kwargs):
+        return TutorialAI()
+
+
+class LITWOvercooked(CompetitiveOvercooked):
+    """
+    Wrapper on OvercookedGame that includes additional data for the MORAL_AI LITW study mechanics
+    """
+
+    def __init__(self, layouts=["mai_separate_coop_needed"], mdp_params={}, playerZero='human', playerOne='AI', **kwargs):
+        super(LITWOvercooked, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
+                                                 playerOne=playerOne, showPotential=False, **kwargs)
+        self.max_time = 30
+        self.max_players = 2
+        self.ticks_per_ai_action = 8
 
     @property
     def reset_timeout(self):
         return 1
 
     def needs_reset(self):
-        if self.curr_phase == 0:
-            return self.score[0] > 0
-        else:
-            return super(OvercookedGame, self).needs_reset()
+        return super(OvercookedGame, self).needs_reset()
 
     def reset(self):
-        print("RESET: {}".format(self.curr_phase))
-        self.max_time = 30
-        super(OvercookedLITW, self).reset()
-        self.curr_phase += 1
+        super(LITWOvercooked, self).reset()
 
     def get_policy(self, *args, **kwargs):
-        return TutorialAI()
+        return MAIDumbAgent()
 
 
 class DummyOvercookedGame(OvercookedGame):
@@ -725,6 +742,7 @@ class DummyAI():
 
     def reset(self):
         pass
+
 
 class DummyComputeAI(DummyAI):
     """
@@ -764,6 +782,104 @@ class StayAI():
 
     def reset(self):
         pass
+
+
+class MAIDumbAgent():
+
+    GRAB_ONION_LONG = [
+        Direction.WEST,
+        Direction.SOUTH,
+        Direction.SOUTH,
+        Direction.SOUTH,
+        Direction.SOUTH,
+        Direction.SOUTH,
+        Direction.EAST,
+        Direction.EAST,
+        Action.INTERACT
+    ]
+
+    PLACE_ONION_LONG = [
+        Direction.WEST,
+        Direction.WEST,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.EAST,
+        Direction.NORTH,
+        Action.INTERACT
+    ]
+
+    PLACE_ONION_HELP = [
+        Direction.WEST,
+        Direction.WEST,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.WEST,
+        Action.INTERACT,
+        Action.STAY,
+        Action.INTERACT,
+        Direction.EAST,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.EAST,
+        Direction.NORTH,
+        Action.INTERACT
+    ]
+
+    COOK_GET_PLATE = [
+        Action.INTERACT,
+        Direction.EAST,
+        Direction.EAST,
+        Direction.SOUTH,
+        Direction.SOUTH,
+        Action.INTERACT,
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.WEST,
+        Direction.WEST,
+        Direction.NORTH,
+        Action.INTERACT
+    ]
+
+    DELIVER_SOUP = [
+        Direction.EAST,
+        Direction.EAST,
+        Direction.SOUTH,
+        Direction.EAST,
+        Action.INTERACT
+    ]
+
+    def __init__(self):
+        self.curr_phase = -1
+        self.curr_tick = -1
+        self.phases = [
+            MAIDumbAgent.GRAB_ONION_LONG,
+            MAIDumbAgent.PLACE_ONION_LONG,
+            MAIDumbAgent.GRAB_ONION_LONG,
+            MAIDumbAgent.PLACE_ONION_HELP,
+            MAIDumbAgent.GRAB_ONION_LONG,
+            MAIDumbAgent.PLACE_ONION_LONG,
+            MAIDumbAgent.COOK_GET_PLATE,
+            MAIDumbAgent.DELIVER_SOUP
+        ]
+
+    def action(self, state):
+        self.curr_tick += 1
+        # NEED INGREDIENT
+        if self.curr_phase < len(self.phases):
+            phase = self.phases[self.curr_phase]
+            if self.curr_tick < len(phase):
+                return phase[self.curr_tick], None
+            else:
+                self.reset()
+        return Action.STAY, None
+
+    def reset(self):
+        self.curr_tick = -1
+        self.curr_phase += 1
 
 
 class TutorialAI():
@@ -850,6 +966,7 @@ class TutorialAI():
         self.curr_tick = -1
 
     def action(self, state):
+        # TODO: Can use state to check if there is a shared onion to move more efficiently
         self.curr_tick += 1
         if self.curr_phase == 0:
             return self.COOK_SOUP_LOOP[self.curr_tick % len(self.COOK_SOUP_LOOP)], None

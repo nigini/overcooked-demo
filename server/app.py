@@ -11,7 +11,7 @@ from threading import Lock
 from utils import ThreadSafeSet, ThreadSafeDict
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, join_room, leave_room, emit
-from game import OvercookedGame, OvercookedTutorial, Game, CompetitiveOvercooked, OvercookedLITW
+from game import OvercookedGame, OvercookedTutorial, Game, CompetitiveOvercooked, LITWOvercooked, LITWTutorial
 import game
 
 
@@ -88,7 +88,8 @@ USER_ROOMS = ThreadSafeDict()
 GAME_NAME_TO_CLS = {
     "overcooked" : CompetitiveOvercooked,
     "tutorial" : OvercookedTutorial,
-    "litw" : OvercookedLITW
+    "litw_tutorial" : LITWTutorial,
+    "litw_cook" : LITWOvercooked
 }
 
 game._configure(MAX_GAME_LENGTH, AGENT_DIR)
@@ -117,7 +118,7 @@ app.logger.addHandler(handler)
 # Global Coordination Functions #
 #################################
 
-def try_create_game(game_name ,**kwargs):
+def try_create_game(game_name, **kwargs):
     """
     Tries to create a brand new Game object based on parameters in `kwargs`
     
@@ -140,6 +141,7 @@ def try_create_game(game_name ,**kwargs):
     except Exception as e:
         return None, e
     else:
+        print('GOT A VALID GAME: {}'.format(game))
         GAMES[game.id] = game
         FREE_MAP[game.id] = False
         return game, None
@@ -409,11 +411,12 @@ def on_create(data):
 @socketio.on('join')
 def on_join(data):
     user_id = request.sid
+    print('JOIN: {}'.format(data))
     with USERS[user_id]:
         create_if_not_found = data.get("create_if_not_found", True)
-
         # Retrieve current game if one exists
         curr_game = get_curr_game(user_id)
+        print('JOIN GAME: {}'.format(curr_game))
         if curr_game:
             # Cannot join if currently in a game
             return
@@ -534,7 +537,7 @@ def play_game(game, fps=30):
     
     with game.lock:
         data = game.get_data()
-        socketio.emit('end_game', { "status" : status, "data" : data }, room=game.id)
+        socketio.emit('reset_game', { "status" : status, "data" : data }, room=game.id)
 
         if status != Game.Status.INACTIVE:
             game.deactivate()

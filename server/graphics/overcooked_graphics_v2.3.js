@@ -43,7 +43,7 @@ function drawState(state) {
     try {
         graphics.set_state(state);
     } catch {
-        console.log("error updating state");
+        console.log("[ERROR] Drawing State: " + JSON.stringify(state));
     }
 };
 

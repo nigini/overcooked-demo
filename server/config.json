@@ -16,10 +16,17 @@
         "onion_value" : 21
     },
     "litw" : {
-        "litwParams" : {
-            "layouts" : ["mai_separate_coop_needed", "tutorial_0"],
+        "tutorial" : {
+            "game_name" : "litw_tutorial",
+            "layouts" : ["tutorial_0"],
             "playerZero" : "human",
             "playerOne" : "TutorialAI"
+        },
+        "mai_left" : {
+            "game_name" : "litw_cook",
+            "layouts" : ["mai_separate_coop_needed"],
+            "playerZero" : "human",
+            "playerOne" : "MAIDumbAgent"
         },
         "onion_value" : 10
     },
