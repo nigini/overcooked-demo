@@ -1,11 +1,3 @@
-/*
-
-Added state potential to HUD
-
-*/
-
-
-
 // How long a graphics update should take in milliseconds
 // Note that the server updates at 30 fps
 var ANIMATION_DURATION = 50;
@@ -24,7 +16,7 @@ var scene_config = {
     show_post_cook_time : false,
     cook_time : 20,
     assets_loc : "./static/assets/",
-    hud_size : 150
+    hud_size : 100
 };
 
 var game_config = {
@@ -339,12 +331,12 @@ class OvercookedScene extends Phaser.Scene {
     }
 
     _drawHUD(hud_data, sprites, board_height) {
-        if (typeof(hud_data.all_orders) !== 'undefined') {
-            this._drawAllOrders(hud_data.all_orders, sprites, board_height);
-        }
-        if (typeof(hud_data.bonus_orders) !== 'undefined') {
-            this._drawBonusOrders(hud_data.bonus_orders, sprites, board_height);
-        }
+        // if (typeof(hud_data.all_orders) !== 'undefined') {
+        //     this._drawAllOrders(hud_data.all_orders, sprites, board_height);
+        // }
+        // if (typeof(hud_data.bonus_orders) !== 'undefined') {
+        //     this._drawBonusOrders(hud_data.bonus_orders, sprites, board_height);
+        // }
         if (typeof(hud_data.time) !== 'undefined') {
             this._drawTimeLeft(hud_data.time, sprites, board_height);
         }
@@ -437,23 +429,26 @@ class OvercookedScene extends Phaser.Scene {
         }
     }
 
-    _drawScore(score, sprites, board_height) {
-        let score_str = "Score: ";
-        for (let value in score) {
-            score_str += ` P_${scene_config.player_colors[value]}=${score[value]}`;
-        }
-        if (typeof(sprites['score']) !== 'undefined') {
-            sprites['score'].setText(score_str);
-        }
-        else {
-            sprites['score'] = this.add.text(
-                5, board_height + 90, score_str,
-                {
-                    font: "20px Arial",
-                    fill: "red",
-                    align: "left"
-                }
-            )
+    _drawScore(scores, sprites, board_height) {
+        if(!sprites['scores']) sprites['scores'] = [];
+        let bin_size = Math.round(this.cameras.main.width/scores.length);
+        for(let score = 0; score < scores.length; score++) {
+            let score_value = scores[score];
+            let player_color = scene_config.player_colors[score];
+            let score_str = `${player_color}: ${score_value}`;
+            if (sprites['scores'][player_color]) {
+                sprites['scores'][player_color].setText(score_str);
+            } else {
+                let positionY = Math.round((score * bin_size)+(bin_size/2))-30;
+                sprites['scores'][player_color] = this.add.text(
+                    positionY, board_height + 55, score_str,
+                    {
+                        font: "30px Arial",
+                        fill: player_color,
+                        align: "left"
+                    }
+                )
+            }
         }
     }
 
@@ -481,11 +476,11 @@ class OvercookedScene extends Phaser.Scene {
         }
         else {
             sprites['time_left'] = this.add.text(
-                5, board_height + 115, time_left,
+                this.cameras.main.centerX - 100, board_height + 15, time_left,
                 {
-                    font: "20px Arial",
+                    font: "40px Arial",
                     fill: "red",
-                    align: "left"
+                    align: "left",
                 }
             )
         }
