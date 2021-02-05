@@ -1,102 +1,21 @@
 // Persistent network connection that will be used to transmit real-time data
-var socket = io();
-var config;
-
+let socket = io();
+let config;
+let curr_study_phase = 0;
+let study_timeline = [];
+let study_phases = ['tutorial', 'mai_left'];
+let templates = {
+    tutorial: {
+        resource: 'static/templates/litw-tutorial.html',
+        template: null
+    }
+};
 var tutorial_instructions = () => [
-    `
-    <p>Mechanic: <b>Delivery</b></p>
-    <p>Your goal here is to cook and deliver soups in order to earn reward. Notice how your partner is busily churning out soups</p>
-    <p>See if you can copy his actions in order to cook and deliver the appropriate soup.</p>
-    <p><b>Note</b>: You must cook a soup with <b>exactly</b> 3 onions to advance.</p>
-    <p>Good luck!</p>
-    `,
     `
     <p>Time to see how many soups you can cook in 30 seconds.</p>
     <p>Ready? Set...</p>
     `
 ];
-
-var tutorial_hints = () => [
-    `
-    <p>
-        You can move up, down, left, and right using
-        the <b>arrow keys</b>, and interact with objects
-        using the <b>spacebar</b>.
-      </p>
-      <p>
-        You can interact with objects by facing them and pressing
-        <b>spacebar</b>. Here are some examples:
-        <ul>
-          <li>You can pick up onions by facing
-            the ingredient area and pressing <b>spacebar</b>.</li>
-          <li>If you are holding an ingredient, are facing an empty counter,
-            and press <b>spacebar</b>, you put the ingredient on the counter.</li>
-          <li>If you are holding an ingredient, are facing a pot that is not full,
-            and press <b>spacebar</b>, you will put the ingredient in the pot.</li>
-          <li>If you are facing a pot that is non-empty, are currently holding nothing, and 
-            and press <b>spacebar</b>, you will begin cooking a soup.</li>
-        </ul>
-      </p>
-    `,
-    `
-    <p>You cannot remove ingredients from the pot. You can, however, cook any soup you like...</p>
-    `,
-    `
-    <p>Each onion is worth ${config['onion_value']} points<p>
-    `
-]
-
-let curr_study_phase = 0;
-let study_phases = ['tutorial', 'mai_left'];
-
-// Read in game config provided by server
-$(function() {
-    config = JSON.parse($('#config').text());
-    tutorial_instructions = tutorial_instructions();
-    tutorial_hints = tutorial_hints();
-    $('#quit').show();
-});
-
-/* * * * * * * * * * * * * * * * 
- * Button click event handlers *
- * * * * * * * * * * * * * * * */
-
-$(function() {
-    $('#try-again').click(function () {
-        data = {
-            "params" : config['tutorial'],
-            "game_name" : "litw_tutorial"
-        };
-        socket.emit("join", data);
-        $('try-again').attr("disable", true);
-    });
-});
-
-$(function() {
-    $('#show-hint').click(function() {
-        let text = $(this).text();
-        let new_text = text === "Show Hint" ? "Hide Hint" : "Show Hint";
-        $('#hint-wrapper').toggle();
-        $(this).text(new_text);
-    });
-});
-
-$(function() {
-    $('#quit').click(function() {
-        socket.emit("leave", {});
-        $('quit').attr("disable", true);
-        window.location.href = "./";
-    });
-});
-
-$(function() {
-    $('#finish').click(function() {
-        $('finish').attr("disable", true);
-        window.location.href = "./";
-    });
-});
-
-
 
 /* * * * * * * * * * * * * 
  * Socket event handlers *
@@ -132,7 +51,6 @@ socket.on('start_game', function(data) {
     $('#game-title').show();
     $('#tutorial-instructions').append(tutorial_instructions[curr_study_phase]);
     $('#instructions-wrapper').show();
-    $('#hint').append(tutorial_hints[curr_study_phase]);
     enable_key_listener();
     graphics_start(graphics_config);
 });
@@ -172,9 +90,49 @@ socket.on('end_game', function (data){
     end_study(data);
 });
 
-function end_study(data) {
-    console.log(`ENDING GAME: ${JSON.stringify(data)}`);
+function start_study(){
+    $.i18n().locale = LITW.locale.getLocale();
+    $.i18n().load({
+        'en': 'static/templates/i18n/en.json',
+    }).done(function(){
+        $('head').i18n();
+        console.log($.i18n('litw-study-title'));
+        $('body').i18n();
+    });
 
+    const async_load = async (template_names) => {
+        const promises = template_names.map(load_template);
+        await Promise.all(promises);
+        console.log('TEMPLATES: '+ JSON.stringify(templates));
+    };
+
+    let template_names = Object.keys(templates);
+    async_load(template_names).then( function(){
+        configure_study();
+        jsPsych.init({
+            timeline: study_timeline
+        });
+    });
+}
+
+function load_template(template_name) {
+    return $.get(templates[template_name].resource, function(html){
+        templates[template_name].template = Handlebars.compile(html);
+        console.log(`LOADED ${JSON.stringify(templates[template_name].template)}`);
+    })
+}
+
+function configure_study() {
+    study_timeline.push({
+        name: "tutorial",
+        type: "display-slide",
+        template: templates.tutorial.template,
+        display_element: $("#tutorial"),
+        show_next: false
+    });
+}
+
+function end_study(data) {
     // Hide game data and display game-over html
     graphics_end();
     disable_key_listener();
@@ -211,6 +169,7 @@ function get_game_config() {
     }
     return game_config;
 }
+
 
 /* * * * * * * * * * * * * * 
  * Game Key Event Listener *
@@ -252,18 +211,7 @@ function disable_key_listener() {
     $(document).off('keydown');
 };
 
-
-/* * * * * * * * * * *
- * Utility Functions *
- * * * * * * * * * * */
-
-var arrToJSON = function(arr) {
-    let retval = {}
-    for (let i = 0; i < arr.length; i++) {
-        elem = arr[i];
-        key = elem['name'];
-        value = elem['value'];
-        retval[key] = value;
-    }
-    return retval;
-};
+$(function() {
+    config = JSON.parse($('#config').text());
+    start_study();
+})
