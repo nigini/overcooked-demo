@@ -1,36 +1,99 @@
+<h2 class="bolded-blue" data-i18n="litw-instruct-header"></h2>
 <div id="tutorial-instructions" class="text-left" style="display:inline-block; width: 50%">
-    <p>Mechanic: <b>Delivery</b></p>
-    <p>Your goal here is to cook and deliver soups in order to earn reward. Notice how your partner is busily churning
-        out soups</p>
-    <p>See if you can copy his actions in order to cook and deliver the appropriate soup.</p>
-    <p><b>Note</b>: You must cook a soup with <b>exactly</b> 3 onions to advance.</p>
-    <p>Good luck!</p>
-    <button id="show-hint" onclick="showHint()">Show Hint</button>
-    <button id="hide-hint" onclick="hideHint()" style="display: none">Hide Hint</button>
-    <div id="tutorial-hint" style="display: none; width: 50%" class="text-left">
-        <p>
-            You can move up, down, left, and right using
-            the <b>arrow keys</b>, and interact with objects
-            using the <b>spacebar</b>.
-        </p>
-        <p>
-            You can interact with objects by facing them and pressing
-            <b>spacebar</b>. Here are some examples:
-        <ul>
-            <li>You can pick up onions by facing
-                the ingredient area and pressing <b>spacebar</b>.
-            </li>
-            <li>If you are holding an ingredient, are facing an empty counter,
-                and press <b>spacebar</b>, you put the ingredient on the counter.
-            </li>
-            <li>If you are holding an ingredient, are facing a pot that is not full,
-                and press <b>spacebar</b>, you will put the ingredient in the pot.
-            </li>
-            <li>If you are facing a pot that is non-empty, are currently holding nothing, and
-                and press <b>spacebar</b>, you will begin cooking a soup.
-            </li>
-        </ul>
-        </p>
+    <p data-i18n="litw-instruct-body-1-p1"></p>
+    <p data-i18n="litw-instruct-body-1-p2"></p>
+    <p><b data-i18n="litw-instruct-body-1-p3"></b> <span data-i18n="litw-instruct-body-1-p4"></span></p>
+    <p data-i18n="litw-instruct-body-1-p5"></p>
+    <div style="display: flex; justify-content: center; margin-bottom: 5px">
+        <button id="show-hint" class="btn btn-secondary" onclick="showHint()" data-i18n="litw-instruct-body-showhint"></button>
+    </div>
+    <div id="tutorial-hint" class="modal" style="display: none">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title" data-i18n="litw-instruct-hint-title"></span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="hideHint()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <span data-i18n="litw-instruct-hint-1-p1"></span><b
+                            data-i18n="litw-instruct-hint-action-arrows"></b>.
+                    </p>
+                    <p>
+                        <span data-i18n="litw-instruct-hint-2-p1"></span><b
+                            data-i18n="litw-instruct-hint-action-space"></b>.
+                        <span data-i18n="litw-instruct-hint-2-p2">:</span>
+                    </p>
+                    <div id="tutorial-actions" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#tutorial-actions" data-slide-to="0" class="active"></li>
+                            <li data-target="#tutorial-actions" data-slide-to="1"></li>
+                            <li data-target="#tutorial-actions" data-slide-to="2"></li>
+                            <li data-target="#tutorial-actions" data-slide-to="3"></li>
+                            <li data-target="#tutorial-actions" data-slide-to="4"></li>
+                            <li data-target="#tutorial-actions" data-slide-to="5"></li>
+                            <li data-target="#tutorial-actions" data-slide-to="6"></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img class="d-block w-100" src="static/images/tutorial-actions/1.png">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5 data-i18n="litw-instruct-hint-action-1"></h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" src="static/images/tutorial-actions/2.png">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5 data-i18n="litw-instruct-hint-action-2"></h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" src="static/images/tutorial-actions/3.png">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5 data-i18n="litw-instruct-hint-action-3"></h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" src="static/images/tutorial-actions/4.png">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5 data-i18n="litw-instruct-hint-action-4"></h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" src="static/images/tutorial-actions/5.png">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5 data-i18n="litw-instruct-hint-action-5"></h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" src="static/images/tutorial-actions/6.png">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5 data-i18n="litw-instruct-hint-action-6"></h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img class="d-block w-100" src="static/images/tutorial-actions/7.png">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5 data-i18n="litw-instruct-hint-action-7"></h5>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#tutorial-actions" role="button"
+                           data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#tutorial-actions" role="button"
+                           data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div id="overcooked-container" class="text-center">
@@ -39,14 +102,11 @@
 
 <script>
     function showHint() {
-        $('#show-hint').hide();
+        $('#tutorial-actions').show();
         $('#tutorial-hint').show();
-        $('#hide-hint').show();
     }
 
     function hideHint() {
-        $('#hide-hint').hide();
         $('#tutorial-hint').hide();
-        $('#show-hint').show();
     }
 </script>

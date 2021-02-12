@@ -10,12 +10,6 @@ let templates = {
         template: null
     }
 };
-var tutorial_instructions = () => [
-    `
-    <p>Time to see how many soups you can cook in 30 seconds.</p>
-    <p>Ready? Set...</p>
-    `
-];
 
 /* * * * * * * * * * * * * 
  * Socket event handlers *
@@ -41,42 +35,15 @@ socket.on('start_game', function(data) {
         container_id : "overcooked",
         start_info : data.start_info
     };
-    $("#overcooked").empty();
-    $('#game-over').hide();
-    $('#try-again').hide();
-    $('#try-again').attr('disabled', true)
-    $('#hint-wrapper').hide();
-    $('#show-hint').text('Show Hint');
-    $('#game-title').text(`Study Progress, Phase ${curr_study_phase + 1}/${tutorial_instructions.length}`);
-    $('#game-title').show();
-    $('#tutorial-instructions').append(tutorial_instructions[curr_study_phase]);
-    $('#instructions-wrapper').show();
     enable_key_listener();
     graphics_start(graphics_config);
 });
 
 socket.on('reset_game', function(data) {
     console.log(`RESET GAME: ${JSON.stringify(data)}`);
-    curr_study_phase++;
     graphics_end();
     disable_key_listener();
-    $("#overcooked").empty();
-    $('#tutorial-instructions').empty();
-    $('#hint').empty();
-
-    if(curr_study_phase < study_phases.length) {
-        $("#tutorial-instructions").append(tutorial_instructions[curr_study_phase]);
-        $("#hint").append(tutorial_hints[curr_study_phase]);
-        $('#game-title').text(`Study Progress, Phase ${curr_study_phase + 1}/${tutorial_instructions.length}`);
-        let button_pressed = $('#show-hint').text() === 'Hide Hint';
-        if (button_pressed) {
-            $('#show-hint').click();
-        }
-        let game_config = get_game_config();
-        socket.emit("join", game_config);
-    } else {
-        end_study(data)
-    }
+    jsPsych.finishTrial();
 });
 
 socket.on('state_pong', function(data) {
