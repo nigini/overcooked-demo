@@ -322,7 +322,7 @@ textarea.comments-box, textarea.comments_box {
 	clear: both;
 	float: right;
 	margin-bottom: 30px;
-	background: url("../img/btn-next.png");
+	background: url("/static/images/litw/btn-next.png");
 	width: 100px;
 	height: 60px;
 	border: none;
@@ -336,7 +336,7 @@ textarea.comments-box, textarea.comments_box {
 	cursor: pointer;
 }
 .btn-next-page:active, #btn-next-page:active { 
-	background: url("../img/btn-next-active.png");
+	background: url("/static/images/litw/btn-next-active.png");
 }
 
 

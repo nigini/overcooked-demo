@@ -51,9 +51,6 @@ MAX_GAMES = CONFIG['MAX_GAMES']
 # Frames per second cap for serving to client
 MAX_FPS = CONFIG['MAX_FPS']
 
-# Default configuration for tutorial
-TUTORIAL_CONFIG = json.dumps(CONFIG['tutorial'])
-
 # Global queue of available IDs. This is how we synch game creation and keep track of how many games are in memory
 FREE_IDS = queue.Queue(maxsize=MAX_GAMES)
 

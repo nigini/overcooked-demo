@@ -22,7 +22,11 @@ let templates = {
         resource: 'static/templates/litw-tutorial.html',
         template: null
     },
-    round1: {
+    rounds_inst: {
+        resource: 'static/templates/litw-round-instructions.html',
+        template: null
+    },
+    rounds: {
         resource: 'static/templates/litw-round.html',
         template: null
     }
@@ -147,13 +151,29 @@ function configure_study() {
         }
     });
     study_timeline.push({
+        name: "round1-instructions",
+        type: "display-slide",
+        display_element: $("#round-instructions"),
+        show_next: true,
+        template: templates.rounds_inst.template,
+        template_data: {
+            'header': $.i18n('litw-round-1-inst-header'),
+            'instructions':[
+                $.i18n('litw-round-1-inst-p1'),
+                $.i18n('litw-round-1-inst-p2'),
+                $.i18n('litw-round-1-inst-p3'),
+                $.i18n('litw-round-1-inst-p4')
+            ]
+        }
+    });
+    study_timeline.push({
         name: "round1",
         type: "display-slide",
         display_element: $("#round-game"),
         show_next: false,
-        template: templates.round1.template,
+        template: templates.rounds.template,
         template_data: {
-            'header': $.i18n('litw-round-1-inst-header')
+            'header': $.i18n('litw-round-1-header')
         },
         setup: function (){
             start_game('mai_left');

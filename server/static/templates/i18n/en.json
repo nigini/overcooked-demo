@@ -94,8 +94,10 @@
   "litw-instruct-hint-action-5": "You can pick up soup while holding a plate by facing the a finished stove and pressing the spacebar.",
   "litw-instruct-hint-action-6": "You can deliver the soup while holding a full plate by facing the delivery (gray) area and pressing the spacebar.",
   "litw-instruct-hint-action-7": "You can items in any free area by facing it while holding the item and pressing the spacebar.",
-  "litw-round-1-inst-header": "Round 1",
-  "litw-round-1-inst-p1": "Now you will have 30 seconds to see how many soups you can serve.",
-  "litw-round-1-inst-p2": "Each soup has to have 3 onions.",
-  "litw-round-1-inst-p3": "You were lucky and was assigned to the left side of the kitchen."
+  "litw-round-1-inst-header": "Round 1: Instructions",
+  "litw-round-1-inst-p1": "Now you will have 30 seconds to see how many soups you can serve in the kitchen below.",
+  "litw-round-1-inst-p2": "ASSIGNMENT: You were lucky and was assigned to the left side of the kitchen.",
+  "litw-round-1-inst-p3": "ORDERS: Customers will only accept soups with 3 onions.",
+  "litw-round-1-inst-p4": "READY? Hit the blue arrow to start the game.",
+  "litw-round-1-header": "Round 1"
 }
