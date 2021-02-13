@@ -14,8 +14,7 @@ jsPsych.plugins["display-slide"] = (function() {
     var plugin = {};
 
     plugin.trial = function(display_element, trial) {
-        if(trial.setup) trial.setup();
-
+        $(".slide").hide().html('');
         var template_data = {};
         if(trial.template_data) {
             if(typeof(trial.template_data) === "function"){
@@ -27,20 +26,20 @@ jsPsych.plugins["display-slide"] = (function() {
         display_element.html(trial.template(template_data));
         display_element.i18n();
 
+        if(trial.setup) trial.setup();
+
         LITW.utils.showNextButton(function() {
             if(trial.finish) trial.finish();
             display_element.empty();
             jsPsych.finishTrial();
         }, {submitKeys: []});
 
-        //TODO Is there a better way to do this?
         if(trial.show_next === false){
             $('#btn-next-page').hide();
         }
 
-
-
-        LITW.utils.showSlide(display_element[0].id);
+        //LITW.utils.showSlide(display_element[0].id);
+        display_element.show();
         if(trial.name) {
             LITW.tracking.recordCheckpoint(trial.name);
         } else {

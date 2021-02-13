@@ -76,7 +76,7 @@
   "litw-comment-email-p2": "info@labinthewild.org",
   "litw-instruct-header": "Please read these instructions and practice how to play below.",
   "litw-instruct-body-1-p1": "Your goal here is to cook and deliver soups in order to earn reward. Notice how your partner is busily churning out soups.",
-  "litw-instruct-body-1-p2": "See if you can copy his actions in order to cook and deliver the appropriate soup.",
+  "litw-instruct-body-1-p2": "See if you can copy their actions in order to cook and deliver the appropriate soup.",
   "litw-instruct-body-1-p3": "Note:",
   "litw-instruct-body-1-p4": "You must cook a soup with exactly 3 onions to advance.",
   "litw-instruct-body-1-p5": "Good luck!",
@@ -93,6 +93,9 @@
   "litw-instruct-hint-action-4": "You can pick up plates by facing the plates area and pressing the spacebar.",
   "litw-instruct-hint-action-5": "You can pick up soup while holding a plate by facing the a finished stove and pressing the spacebar.",
   "litw-instruct-hint-action-6": "You can deliver the soup while holding a full plate by facing the delivery (gray) area and pressing the spacebar.",
-  "litw-instruct-hint-action-7": "You can items in any free area by facing it while holding the item and pressing the spacebar."
-
+  "litw-instruct-hint-action-7": "You can items in any free area by facing it while holding the item and pressing the spacebar.",
+  "litw-round-1-inst-header": "Round 1",
+  "litw-round-1-inst-p1": "Now you will have 30 seconds to see how many soups you can serve.",
+  "litw-round-1-inst-p2": "Each soup has to have 3 onions.",
+  "litw-round-1-inst-p3": "You were lucky and was assigned to the left side of the kitchen."
 }

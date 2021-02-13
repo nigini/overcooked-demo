@@ -1,12 +1,29 @@
 // Persistent network connection that will be used to transmit real-time data
 let socket = io();
-let config;
-let curr_study_phase = 0;
+let games_config = {
+    "tutorial" : {
+        "game_name" : "litw_tutorial",
+        "layouts" : ["tutorial_0"],
+        "playerZero" : "human",
+        "playerOne" : "TutorialAI",
+        "onion_value" : 10
+    },
+    "mai_left" : {
+        "game_name" : "litw_cook",
+        "layouts" : ["mai_separate_coop_needed"],
+        "playerZero" : "human",
+        "playerOne" : "MAIDumbAgent",
+        "onion_value" : 10
+    },
+};
 let study_timeline = [];
-let study_phases = ['tutorial', 'mai_left'];
 let templates = {
     tutorial: {
         resource: 'static/templates/litw-tutorial.html',
+        template: null
+    },
+    round1: {
+        resource: 'static/templates/litw-round.html',
         template: null
     }
 };
@@ -25,8 +42,7 @@ socket.on('creation_failed', function(data) {
 });
 
 socket.on("connect", function() {
-    let game_data = get_game_config();
-    socket.emit("join", game_data);
+    console.log("SOCKET CONNECTED!");
 });
 
 socket.on('start_game', function(data) {
@@ -54,8 +70,38 @@ socket.on('state_pong', function(data) {
 });
 
 socket.on('end_game', function (data){
-    end_study(data);
+    end_game(data);
 });
+
+function start_game(game_name) {
+    let game_config = get_game_config(game_name);
+    console.log("STARTING GAME: " + JSON.stringify(game_config));
+    socket.emit("join", game_config);
+}
+
+function get_game_config(config_name) {
+    let game_config = null;
+    if(config_name in games_config){
+        let stored_config = games_config[config_name];
+        let game_name = stored_config['game_name'];
+        delete stored_config['game_name'];
+        game_config = {
+            "params": stored_config,
+            "game_name": game_name
+        }
+    }
+    return game_config;
+}
+
+function end_game(data) {
+    // Hide game data and display game-over html
+    graphics_end();
+    disable_key_listener();
+    console.log("END_STUDY: " + JSON.stringify(data));
+}
+
+
+/* LITW STUDY TIMELINE */
 
 function start_study(){
     $.i18n().locale = LITW.locale.getLocale();
@@ -95,50 +141,28 @@ function configure_study() {
         type: "display-slide",
         template: templates.tutorial.template,
         display_element: $("#tutorial"),
-        show_next: false
+        show_next: false,
+        setup: function (){
+            start_game('tutorial');
+        }
+    });
+    study_timeline.push({
+        name: "round1",
+        type: "display-slide",
+        display_element: $("#round-game"),
+        show_next: false,
+        template: templates.round1.template,
+        template_data: {
+            'header': $.i18n('litw-round-1-inst-header')
+        },
+        setup: function (){
+            start_game('mai_left');
+        }
+
     });
 }
 
-function end_study(data) {
-    // Hide game data and display game-over html
-    graphics_end();
-    disable_key_listener();
-    $('#game-title').hide();
-    $('#instructions-wrapper').hide();
-    $('#hint-wrapper').hide();
-    $('#show-hint').hide();
-    $('#game-over').show();
-    $('#quit').hide();
-
-    if (data.status === 'inactive') {
-        // Game ended unexpectedly
-        $('#error-exit').show();
-        // Propogate game stats to parent window with psiturk code
-        window.top.postMessage({ name : "error" }, "*");
-    } else {
-        // Propogate game stats to parent window with psiturk code
-        window.top.postMessage({ name : "tutorial-done" }, "*");
-    }
-
-    $('#finish').show();
-}
-
-function get_game_config() {
-    let game_config = null;
-    if(curr_study_phase < study_phases.length){
-        let stored_config = config[study_phases[curr_study_phase]];
-        let game_name = stored_config['game_name'];
-        delete stored_config['game_name'];
-        game_config = {
-            "params": stored_config,
-            "game_name": game_name
-        }
-    }
-    return game_config;
-}
-
-
-/* * * * * * * * * * * * * * 
+/* * * * * * * * * * * * * *
  * Game Key Event Listener *
  * * * * * * * * * * * * * */
 
@@ -179,6 +203,5 @@ function disable_key_listener() {
 };
 
 $(function() {
-    config = JSON.parse($('#config').text());
     start_study();
 })

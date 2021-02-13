@@ -54,9 +54,6 @@ MAX_FPS = CONFIG['MAX_FPS']
 # Default configuration for tutorial
 TUTORIAL_CONFIG = json.dumps(CONFIG['tutorial'])
 
-# Default configuration for the MORALAI LITW study
-LITW_CONFIG = json.dumps(CONFIG['litw'])
-
 # Global queue of available IDs. This is how we synch game creation and keep track of how many games are in memory
 FREE_IDS = queue.Queue(maxsize=MAX_GAMES)
 
@@ -341,7 +338,7 @@ def index():
 
 @app.route('/litw')
 def litw():
-    return render_template('litw.html', config=LITW_CONFIG)
+    return render_template('litw.html')
 
 @app.route('/debug')
 def debug():
