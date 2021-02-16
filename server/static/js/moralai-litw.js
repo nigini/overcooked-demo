@@ -169,6 +169,12 @@ function _init_litw(){
 
 function start_study(){
     _init_litw();
+
+    const async_load = async (template_names) => {
+        const promises = template_names.map(load_template);
+        await Promise.all(promises);
+    };
+
     $.i18n().locale = study_data.locale;
     $.i18n().load({
         'en': 'static/templates/i18n/en.json',
@@ -176,19 +182,12 @@ function start_study(){
         $('head').i18n();
         console.log($.i18n('litw-study-title'));
         $('body').i18n();
-    });
-
-    const async_load = async (template_names) => {
-        const promises = template_names.map(load_template);
-        await Promise.all(promises);
-        console.log('TEMPLATES: '+ JSON.stringify(templates));
-    };
-
-    let template_names = Object.keys(templates);
-    async_load(template_names).then( function(){
-        configure_study();
-        jsPsych.init({
-            timeline: study_timeline
+        let template_names = Object.keys(templates);
+        async_load(template_names).then( function(){
+            configure_study();
+            jsPsych.init({
+                timeline: study_timeline
+            });
         });
     });
 }
