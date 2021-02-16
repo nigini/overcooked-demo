@@ -253,6 +253,7 @@ def  _leave_game(user_id):
 def _create_game(user_id, game_name, params={}):
     game, err = try_create_game(game_name, **params)
     if not game:
+        print("CREATE GAME: {}".format(err))
         emit("creation_failed", { "error" : err.__repr__() })
         return
     spectating = True

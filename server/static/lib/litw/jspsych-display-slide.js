@@ -39,7 +39,7 @@ jsPsych.plugins["display-slide"] = (function() {
         }
 
         //LITW.utils.showSlide(display_element[0].id);
-        display_element.show();
+        display_element.css('display', 'table');
         if(trial.name) {
             LITW.tracking.recordCheckpoint(trial.name);
         } else {

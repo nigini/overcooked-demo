@@ -33,7 +33,7 @@
                 params.participantId = uuidv4();
                 params.userAgent = navigator.userAgent;
                 let geoip_url = 'https://www.labinthewild.org/include/geoip.php';
-                $.getJSON(geoip_url, function(data) {
+                return $.getJSON(geoip_url, function(data) {
                     params.ipCity = data.city;
                     params.ipCountry = data.country;
                 }).always(function() {

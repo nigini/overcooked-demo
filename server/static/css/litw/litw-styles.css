@@ -547,7 +547,9 @@ select {
 }
 .slide {
 	display: none;
+	margin: 0 auto;
 }
+
 .hoverable:hover {
 	cursor: pointer;
 }

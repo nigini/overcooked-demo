@@ -694,97 +694,91 @@ class LITWTutorial(CompetitiveOvercooked):
         return TutorialAI()
 
 
-class LITWOvercooked(CompetitiveOvercooked):
-    """
-    Wrapper on OvercookedGame that includes additional data for the MORAL_AI LITW study mechanics
-    """
+class MAIDumbAgent:
+    def __init__(self, steps=[]):
+        self.curr_phase = -1
+        self.curr_tick = -1
+        self.phases = steps
 
-    def __init__(self, layouts=["mai_separate_coop_needed"], mdp_params={}, playerZero='human', playerOne='AI', **kwargs):
-        super(LITWOvercooked, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
-                                                 playerOne=playerOne, showPotential=False, **kwargs)
-        self.max_time = 30
-        self.max_players = 2
-        self.ticks_per_ai_action = 8
-
-    @property
-    def reset_timeout(self):
-        return 1
-
-    def needs_reset(self):
-        return super(OvercookedGame, self).needs_reset()
-
-    def reset(self):
-        super(LITWOvercooked, self).reset()
-
-    def get_policy(self, *args, **kwargs):
-        return MAIDumbAgent()
-
-
-class DummyOvercookedGame(OvercookedGame):
-    """
-    Class that hardcodes the AI to be random. Used for debugging
-    """
-    
-    def __init__(self, layouts=["cramped_room"], **kwargs):
-        super(DummyOvercookedGame, self).__init__(layouts, **kwargs)
-
-    def get_policy(self, *args, **kwargs):
-        return DummyAI()
-
-
-class DummyAI():
-    """
-    Randomly samples actions. Used for debugging
-    """
     def action(self, state):
-        [action] = random.sample([Action.STAY, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, Action.INTERACT], 1)
-        return action, None
-
-    def reset(self):
-        pass
-
-
-class DummyComputeAI(DummyAI):
-    """
-    Performs simulated compute before randomly sampling actions. Used for debugging
-    """
-    def __init__(self, compute_unit_iters=1e5):
-        """
-        compute_unit_iters (int): Number of for loop cycles in one "unit" of compute. Number of 
-                                    units performed each time is randomly sampled
-        """
-        super(DummyComputeAI, self).__init__()
-        self.compute_unit_iters = int(compute_unit_iters)
-    
-    def action(self, state):
-        # Randomly sample amount of time to busy wait
-        iters = random.randint(1, 10) * self.compute_unit_iters
-
-        # Actually compute something (can't sleep) to avoid scheduling optimizations
-        val = 0
-        for i in range(iters):
-            # Avoid branch prediction optimizations
-            if i % 2 == 0:
-                val += 1
+        self.curr_tick += 1
+        # NEED INGREDIENT
+        if self.curr_phase < len(self.phases):
+            phase = self.phases[self.curr_phase]
+            if self.curr_tick < len(phase):
+                return phase[self.curr_tick], None
             else:
-                val += 2
-        
-        # Return randomly sampled action
-        return super(DummyComputeAI, self).action(state)
-
-    
-class StayAI():
-    """
-    Always returns "stay" action. Used for debugging
-    """
-    def action(self, state):
+                self.reset()
         return Action.STAY, None
 
     def reset(self):
-        pass
+        self.curr_tick = -1
+        self.curr_phase += 1
+        if self.curr_phase >= len(self.phases):
+            self.curr_phase = 0
 
 
-class MAIDumbAgent():
+class MAIDumbAgentLeftCoop(MAIDumbAgent):
+
+    GRAB_ONION_LONG = [
+        Direction.EAST,
+        Direction.SOUTH,
+        Direction.SOUTH,
+        Action.INTERACT
+    ]
+
+    PLACE_ONION_LONG = [
+        Direction.NORTH,
+        Direction.NORTH,
+        Direction.WEST,
+        Direction.NORTH,
+        Action.INTERACT
+    ]
+
+    PLACE_ONION_HELP = [
+        Direction.EAST,
+        Action.INTERACT,
+        Direction.SOUTH,
+        Action.INTERACT
+    ]
+
+    COOK_GET_PLATE = [
+        Action.INTERACT,
+        Direction.WEST,
+        Direction.WEST,
+        Direction.SOUTH,
+        Direction.WEST,
+        Action.INTERACT,
+        Direction.NORTH,
+        Direction.EAST,
+        Direction.EAST,
+        Direction.NORTH,
+        Action.INTERACT
+    ]
+
+    DELIVER_SOUP = [
+        Direction.EAST,
+        Action.INTERACT,
+    ]
+
+    def __init__(self):
+        steps = [
+            MAIDumbAgentLeftCoop.GRAB_ONION_LONG,
+            MAIDumbAgentLeftCoop.PLACE_ONION_HELP,
+            MAIDumbAgentLeftCoop.PLACE_ONION_LONG,
+            MAIDumbAgentLeftCoop.GRAB_ONION_LONG,
+            MAIDumbAgentLeftCoop.PLACE_ONION_HELP,
+            MAIDumbAgentLeftCoop.PLACE_ONION_LONG,
+            MAIDumbAgentLeftCoop.GRAB_ONION_LONG,
+            MAIDumbAgentLeftCoop.PLACE_ONION_HELP,
+            MAIDumbAgentLeftCoop.PLACE_ONION_LONG,
+            MAIDumbAgentLeftCoop.COOK_GET_PLATE,
+            MAIDumbAgentLeftCoop.DELIVER_SOUP
+        ]
+        super().__init__(steps)
+
+
+class MAIDumbAgentRightCoop(MAIDumbAgent):
 
     GRAB_ONION_LONG = [
         Direction.WEST,
@@ -849,37 +843,165 @@ class MAIDumbAgent():
         Direction.EAST,
         Direction.SOUTH,
         Direction.EAST,
-        Action.INTERACT
+        Action.INTERACT,
+        Direction.NORTH,
+        Direction.WEST,
+        Direction.WEST
     ]
 
     def __init__(self):
-        self.curr_phase = -1
-        self.curr_tick = -1
-        self.phases = [
-            MAIDumbAgent.GRAB_ONION_LONG,
-            MAIDumbAgent.PLACE_ONION_LONG,
-            MAIDumbAgent.GRAB_ONION_LONG,
-            MAIDumbAgent.PLACE_ONION_HELP,
-            MAIDumbAgent.GRAB_ONION_LONG,
-            MAIDumbAgent.PLACE_ONION_LONG,
-            MAIDumbAgent.COOK_GET_PLATE,
-            MAIDumbAgent.DELIVER_SOUP
+        steps = [
+            MAIDumbAgentRightCoop.GRAB_ONION_LONG,
+            MAIDumbAgentRightCoop.PLACE_ONION_LONG,
+            MAIDumbAgentRightCoop.GRAB_ONION_LONG,
+            MAIDumbAgentRightCoop.PLACE_ONION_HELP,
+            MAIDumbAgentRightCoop.GRAB_ONION_LONG,
+            MAIDumbAgentRightCoop.PLACE_ONION_LONG,
+            MAIDumbAgentRightCoop.COOK_GET_PLATE,
+            MAIDumbAgentRightCoop.DELIVER_SOUP
         ]
+        super().__init__(steps)
 
+
+class LITWOvercooked(CompetitiveOvercooked):
+    LITW_AGENTS = {
+        'left_coop': MAIDumbAgentLeftCoop,
+        'right_coop': MAIDumbAgentRightCoop,
+        'dummy': MAIDumbAgent
+    }
+
+    """
+    Wrapper on OvercookedGame that includes additional data for the MORAL_AI LITW study mechanics
+    """
+
+    def __init__(self, litw_uuid='-1', layouts=["mai_separate_coop_needed"],
+                 mdp_params={}, playerZero='human', playerOne='left_coop', **kwargs):
+        self.ai = 'dummy'
+        if not playerZero == 'human':
+            self.ai = playerZero
+        elif not playerOne == 'human':
+            self.ai = playerOne
+        self.litw_uuid = litw_uuid
+        super(LITWOvercooked, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
+                                                 playerOne=playerOne, showPotential=False, **kwargs)
+        self.trajectory = []
+        self.max_time = 30
+        self.max_players = 2
+        self.ticks_per_ai_action = 8
+
+    @property
+    def reset_timeout(self):
+        return 1
+
+    def needs_reset(self):
+        return super(OvercookedGame, self).needs_reset()
+
+    def reset(self):
+        super(LITWOvercooked, self).reset()
+
+    def get_policy(self, *args, **kwargs):
+        if self.ai in self.LITW_AGENTS:
+            return self.LITW_AGENTS[self.ai]()
+        else:
+            return MAIDumbAgent()
+
+    def apply_actions(self):
+        """
+        Applies pending actions then logs transition data
+        """
+        # Apply MDP logic
+        prev_state, joint_action, info = super(LITWOvercooked, self).apply_actions()
+
+        transition = {
+            "state": prev_state.to_dict(),
+            "joint_action": joint_action,
+            "time_left": max(self.max_time - (time() - self.start_time), 0),
+            "score": self.score[:],
+            "time_elapsed": time() - self.start_time,
+            "cur_gameloop": self.curr_tick,
+        }
+        self.trajectory.append(transition)
+
+    def get_data(self):
+        """
+        Returns and then clears the accumulated trajectory
+        """
+        data = {
+            "litw_uuid": self.litw_uuid,
+            "layout": self.mdp.terrain_mtx,
+            "layout_name": self.curr_layout,
+            "player_0_id": self.players[0],
+            "player_1_id": self.players[1],
+            "player_0_is_human": self.players[0] in self.human_players,
+            "player_1_is_human": self.players[1] in self.human_players,
+            "trajectory": self.trajectory
+        }
+        self.trajectory = []
+        return data
+
+
+class DummyOvercookedGame(OvercookedGame):
+    """
+    Class that hardcodes the AI to be random. Used for debugging
+    """
+    
+    def __init__(self, layouts=["cramped_room"], **kwargs):
+        super(DummyOvercookedGame, self).__init__(layouts, **kwargs)
+
+    def get_policy(self, *args, **kwargs):
+        return DummyAI()
+
+
+class DummyAI():
+    """
+    Randomly samples actions. Used for debugging
+    """
     def action(self, state):
-        self.curr_tick += 1
-        # NEED INGREDIENT
-        if self.curr_phase < len(self.phases):
-            phase = self.phases[self.curr_phase]
-            if self.curr_tick < len(phase):
-                return phase[self.curr_tick], None
+        [action] = random.sample([Action.STAY, Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, Action.INTERACT], 1)
+        return action, None
+
+    def reset(self):
+        pass
+
+
+class DummyComputeAI(DummyAI):
+    """
+    Performs simulated compute before randomly sampling actions. Used for debugging
+    """
+    def __init__(self, compute_unit_iters=1e5):
+        """
+        compute_unit_iters (int): Number of for loop cycles in one "unit" of compute. Number of 
+                                    units performed each time is randomly sampled
+        """
+        super(DummyComputeAI, self).__init__()
+        self.compute_unit_iters = int(compute_unit_iters)
+    
+    def action(self, state):
+        # Randomly sample amount of time to busy wait
+        iters = random.randint(1, 10) * self.compute_unit_iters
+
+        # Actually compute something (can't sleep) to avoid scheduling optimizations
+        val = 0
+        for i in range(iters):
+            # Avoid branch prediction optimizations
+            if i % 2 == 0:
+                val += 1
             else:
-                self.reset()
+                val += 2
+        
+        # Return randomly sampled action
+        return super(DummyComputeAI, self).action(state)
+
+    
+class StayAI():
+    """
+    Always returns "stay" action. Used for debugging
+    """
+    def action(self, state):
         return Action.STAY, None
 
     def reset(self):
-        self.curr_tick = -1
-        self.curr_phase += 1
+        pass
 
 
 class TutorialAI():

@@ -1,18 +1,25 @@
 // Persistent network connection that will be used to transmit real-time data
 let socket = io();
 let games_config = {
-    "tutorial" : {
+    "tutorial": {
         "game_name" : "litw_tutorial",
         "layouts" : ["tutorial_0"],
         "playerZero" : "human",
         "playerOne" : "TutorialAI",
         "onion_value" : 10
     },
-    "mai_left" : {
+    "mai_left": {
         "game_name" : "litw_cook",
-        "layouts" : ["mai_separate_coop_needed"],
+        "layouts" : ["mai_separate_coop_left"],
         "playerZero" : "human",
-        "playerOne" : "MAIDumbAgent",
+        "playerOne" : "right_coop",
+        "onion_value" : 10
+    },
+    "mai_right": {
+        "game_name" : "litw_cook",
+        "layouts" : ["mai_separate_coop_right"],
+        "playerZero" : "human",
+        "playerOne" : "left_coop",
         "onion_value" : 10
     },
 };
@@ -31,11 +38,10 @@ let templates = {
         template: null
     }
 };
+let study_data = {};
 
-/* * * * * * * * * * * * * 
- * Socket event handlers *
- * * * * * * * * * * * * */
 
+/* Socket event handlers */
 socket.on('creation_failed', function(data) {
     // Tell user what went wrong
     let err = data['error']
@@ -60,9 +66,13 @@ socket.on('start_game', function(data) {
 });
 
 socket.on('reset_game', function(data) {
-    console.log(`RESET GAME: ${JSON.stringify(data)}`);
+    let game_data = data.data;
     graphics_end();
     disable_key_listener();
+    let size = study_data.games.length;
+    if(size>0) {
+        study_data.games[size-1].data = game_data;
+    }
     jsPsych.finishTrial();
 });
 
@@ -86,9 +96,10 @@ function start_game(game_name) {
 function get_game_config(config_name) {
     let game_config = null;
     if(config_name in games_config){
-        let stored_config = games_config[config_name];
+        let stored_config = JSON.parse(JSON.stringify(games_config[config_name]));
         let game_name = stored_config['game_name'];
         delete stored_config['game_name'];
+        stored_config.litw_uuid = LITW.data.getParticipantId();
         game_config = {
             "params": stored_config,
             "game_name": game_name
@@ -105,10 +116,60 @@ function end_game(data) {
 }
 
 
-/* LITW STUDY TIMELINE */
+/* Game Key Event Listener */
+
+function enable_key_listener() {
+    $(document).on('keydown', function(e) {
+        let action = 'STAY'
+        switch (e.which) {
+            case 37: // left
+                action = 'LEFT';
+                break;
+
+            case 38: // up
+                action = 'UP';
+                break;
+
+            case 39: // right
+                action = 'RIGHT';
+                break;
+
+            case 40: // down
+                action = 'DOWN';
+                break;
+
+            case 32: //space
+                action = 'SPACE';
+                break;
+
+            default: // exit this handler for other keys
+                return;
+        }
+        e.preventDefault();
+        socket.emit('action', { 'action' : action });
+    });
+};
+
+function disable_key_listener() {
+    $(document).off('keydown');
+};
+
+
+/* LITW STUDY CONFIGURATION */
+
+function _init_litw(){
+    LITW.data.initialize().then( function () {
+        study_data.litw_uuid = LITW.data.getParticipantId();
+        study_data.country = LITW.data.getCountry();
+        study_data.city = LITW.data.getCity();
+    });
+    study_data.locale = LITW.locale.getLocale();
+    study_data.games = [];
+}
 
 function start_study(){
-    $.i18n().locale = LITW.locale.getLocale();
+    _init_litw();
+    $.i18n().locale = study_data.locale;
     $.i18n().load({
         'en': 'static/templates/i18n/en.json',
     }).done(function(){
@@ -176,51 +237,63 @@ function configure_study() {
             'header': $.i18n('litw-round-1-header')
         },
         setup: function (){
+            study_data.games.push({name: 'round1'});
             start_game('mai_left');
-        }
+        },
 
+    });
+
+    let privileged = Math.random() >= .5;
+    study_data.privileged = privileged;
+    let priv_instruction_key = 'litw-round-2-inst-p2-priv';
+    let round_2_conf = 'mai_left';
+    if(!privileged) {
+        priv_instruction_key = 'litw-round-2-inst-p2-npriv';
+        round_2_conf = 'mai_right';
+    }
+    study_timeline.push({
+        name: "round2-instructions",
+        type: "display-slide",
+        display_element: $("#round-instructions"),
+        show_next: true,
+        template: templates.rounds_inst.template,
+        template_data: {
+            'header': $.i18n('litw-round-2-inst-header'),
+            'instructions':[
+                $.i18n('litw-round-2-inst-p1'),
+                $.i18n(priv_instruction_key),
+                $.i18n('litw-round-2-inst-p3'),
+                $.i18n('litw-round-2-inst-p4')
+            ]
+        }
+    });
+    study_timeline.push({
+        name: "round2",
+        type: "display-slide",
+        display_element: $("#round-game"),
+        show_next: false,
+        template: templates.rounds.template,
+        template_data: {
+            'header': $.i18n('litw-round-2-header')
+        },
+        setup: function (){
+            study_data.games.push({name: 'round2'});
+            start_game(round_2_conf);
+        }
+    });
+    study_timeline.push({
+       type: "call-function",
+       func: function(){
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(study_data));
+            let downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "study_data.json");
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+       }
     });
 }
-
-/* * * * * * * * * * * * * *
- * Game Key Event Listener *
- * * * * * * * * * * * * * */
-
-function enable_key_listener() {
-    $(document).on('keydown', function(e) {
-        let action = 'STAY'
-        switch (e.which) {
-            case 37: // left
-                action = 'LEFT';
-                break;
-
-            case 38: // up
-                action = 'UP';
-                break;
-
-            case 39: // right
-                action = 'RIGHT';
-                break;
-
-            case 40: // down
-                action = 'DOWN';
-                break;
-
-            case 32: //space
-                action = 'SPACE';
-                break;
-
-            default: // exit this handler for other keys
-                return; 
-        }
-        e.preventDefault();
-        socket.emit('action', { 'action' : action });
-    });
-};
-
-function disable_key_listener() {
-    $(document).off('keydown');
-};
 
 $(function() {
     start_study();
