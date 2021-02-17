@@ -695,20 +695,24 @@ class LITWTutorial(CompetitiveOvercooked):
 
 
 class MAIDumbAgent:
-    def __init__(self, steps=[]):
+    def __init__(self, sequence=[], steps={}):
         self.curr_phase = -1
         self.curr_tick = -1
-        self.phases = steps
+        self.phases = sequence
+        self.formulas = steps
 
     def action(self, state):
         self.curr_tick += 1
-        # NEED INGREDIENT
         if self.curr_phase < len(self.phases):
-            phase = self.phases[self.curr_phase]
-            if self.curr_tick < len(phase):
-                return phase[self.curr_tick], None
+            formula_name = self.phases[self.curr_phase]
+            if formula_name in self.formulas:
+                phase = self.formulas[formula_name]
+                if self.curr_tick < len(phase):
+                    return phase[self.curr_tick], None
+                else:
+                    self.reset_smart(state)
             else:
-                self.reset()
+                self.curr_phase += 1
         return Action.STAY, None
 
     def reset(self):
@@ -717,150 +721,183 @@ class MAIDumbAgent:
         if self.curr_phase >= len(self.phases):
             self.curr_phase = 0
 
+    def reset_smart(self, state):
+        self.reset()
+
 
 class MAIDumbAgentLeftCoop(MAIDumbAgent):
 
-    GRAB_ONION_LONG = [
-        Direction.EAST,
-        Direction.SOUTH,
-        Direction.SOUTH,
-        Action.INTERACT
-    ]
-
-    PLACE_ONION_LONG = [
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.WEST,
-        Direction.NORTH,
-        Action.INTERACT
-    ]
-
-    PLACE_ONION_HELP = [
-        Direction.EAST,
-        Action.INTERACT,
-        Direction.SOUTH,
-        Action.INTERACT
-    ]
-
-    COOK_GET_PLATE = [
-        Action.INTERACT,
-        Direction.WEST,
-        Direction.WEST,
-        Direction.SOUTH,
-        Direction.WEST,
-        Action.INTERACT,
-        Direction.NORTH,
-        Direction.EAST,
-        Direction.EAST,
-        Direction.NORTH,
-        Action.INTERACT
-    ]
-
-    DELIVER_SOUP = [
-        Direction.EAST,
-        Action.INTERACT,
-    ]
+    STEPS = {
+        'GRAB_ONION_LONG': [
+            Direction.EAST,
+            Direction.SOUTH,
+            Direction.SOUTH,
+            Action.INTERACT
+        ],
+        'PLACE_ONION_LONG': [
+            Direction.NORTH,
+            Direction.NORTH,
+            Direction.WEST,
+            Direction.NORTH,
+            Action.INTERACT
+        ],
+        'PLACE_ONION_HELP': [
+            Direction.EAST,
+            Action.INTERACT,
+            Direction.SOUTH,
+            Action.INTERACT
+        ],
+        'COOK_GET_PLATE': [
+            Action.INTERACT,
+            Direction.WEST,
+            Direction.WEST,
+            Direction.SOUTH,
+            Direction.WEST,
+            Action.INTERACT,
+            Direction.NORTH,
+            Direction.EAST,
+            Direction.EAST,
+            Direction.NORTH,
+            Action.INTERACT
+        ],
+        'DELIVER_SOUP': [
+            Direction.EAST,
+            Action.INTERACT,
+        ]
+    }
 
     def __init__(self):
-        steps = [
-            MAIDumbAgentLeftCoop.GRAB_ONION_LONG,
-            MAIDumbAgentLeftCoop.PLACE_ONION_HELP,
-            MAIDumbAgentLeftCoop.PLACE_ONION_LONG,
-            MAIDumbAgentLeftCoop.GRAB_ONION_LONG,
-            MAIDumbAgentLeftCoop.PLACE_ONION_HELP,
-            MAIDumbAgentLeftCoop.PLACE_ONION_LONG,
-            MAIDumbAgentLeftCoop.GRAB_ONION_LONG,
-            MAIDumbAgentLeftCoop.PLACE_ONION_HELP,
-            MAIDumbAgentLeftCoop.PLACE_ONION_LONG,
-            MAIDumbAgentLeftCoop.COOK_GET_PLATE,
-            MAIDumbAgentLeftCoop.DELIVER_SOUP
+        sequence = [
+            'GRAB_ONION_LONG',
+            'PLACE_ONION_HELP',
+            'PLACE_ONION_LONG',
+            'GRAB_ONION_LONG',
+            'PLACE_ONION_HELP',
+            'PLACE_ONION_LONG',
+            'GRAB_ONION_LONG',
+            'PLACE_ONION_HELP',
+            'PLACE_ONION_LONG',
+            'COOK_GET_PLATE',
+            'DELIVER_SOUP'
         ]
-        super().__init__(steps)
+        super().__init__(sequence, MAIDumbAgentLeftCoop.STEPS)
 
 
 class MAIDumbAgentRightCoop(MAIDumbAgent):
-
-    GRAB_ONION_LONG = [
-        Direction.WEST,
-        Direction.SOUTH,
-        Direction.SOUTH,
-        Direction.SOUTH,
-        Direction.SOUTH,
-        Direction.SOUTH,
-        Direction.EAST,
-        Direction.EAST,
-        Action.INTERACT
-    ]
-
-    PLACE_ONION_LONG = [
-        Direction.WEST,
-        Direction.WEST,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.EAST,
-        Direction.NORTH,
-        Action.INTERACT
-    ]
-
-    PLACE_ONION_HELP = [
-        Direction.WEST,
-        Direction.WEST,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.WEST,
-        Action.INTERACT,
-        Action.STAY,
-        Action.INTERACT,
-        Direction.EAST,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.EAST,
-        Direction.NORTH,
-        Action.INTERACT
-    ]
-
-    COOK_GET_PLATE = [
-        Action.INTERACT,
-        Direction.EAST,
-        Direction.EAST,
-        Direction.SOUTH,
-        Direction.SOUTH,
-        Action.INTERACT,
-        Direction.NORTH,
-        Direction.NORTH,
-        Direction.WEST,
-        Direction.WEST,
-        Direction.NORTH,
-        Action.INTERACT
-    ]
-
-    DELIVER_SOUP = [
-        Direction.EAST,
-        Direction.EAST,
-        Direction.SOUTH,
-        Direction.EAST,
-        Action.INTERACT,
-        Direction.NORTH,
-        Direction.WEST,
-        Direction.WEST
-    ]
+    STEPS = {
+        'STOVE_TO_CENTER': [
+            Direction.WEST,
+            Direction.SOUTH,
+            Direction.SOUTH
+        ],
+        'GRAB_ONION_SHORT': [
+            Direction.WEST,
+            Action.INTERACT,
+            Direction.EAST
+        ],
+        'GRAB_ONION_LONG': [
+            Direction.SOUTH,
+            Direction.SOUTH,
+            Direction.SOUTH,
+            Direction.EAST,
+            Direction.EAST,
+            Action.INTERACT,
+            Direction.WEST,
+            Direction.WEST,
+            Direction.NORTH,
+            Direction.NORTH,
+            Direction.NORTH
+        ],
+        'PLACE_ONION_STOVE': [
+            Direction.NORTH,
+            Direction.NORTH,
+            Direction.EAST,
+            Direction.NORTH,
+            Action.INTERACT
+        ],
+        'PLACE_ONION_HELP': [
+            Direction.WEST,
+            Action.INTERACT,
+            Action.STAY,
+            Action.INTERACT,
+            Direction.EAST,
+        ],
+        'COOK_GET_PLATE': [
+            Action.INTERACT,
+            Direction.EAST,
+            Direction.EAST,
+            Direction.SOUTH,
+            Direction.SOUTH,
+            Action.INTERACT,
+            Direction.NORTH,
+            Direction.NORTH,
+            Direction.WEST,
+            Direction.WEST,
+            Direction.NORTH,
+            Action.INTERACT
+        ],
+        'DELIVER_SOUP': [
+            Direction.EAST,
+            Direction.EAST,
+            Direction.SOUTH,
+            Direction.EAST,
+            Action.INTERACT,
+            Direction.SOUTH,
+            Direction.WEST,
+            Direction.WEST,
+            Direction.WEST
+        ]
+    }
 
     def __init__(self):
-        steps = [
-            MAIDumbAgentRightCoop.GRAB_ONION_LONG,
-            MAIDumbAgentRightCoop.PLACE_ONION_LONG,
-            MAIDumbAgentRightCoop.GRAB_ONION_LONG,
-            MAIDumbAgentRightCoop.PLACE_ONION_HELP,
-            MAIDumbAgentRightCoop.GRAB_ONION_LONG,
-            MAIDumbAgentRightCoop.PLACE_ONION_LONG,
-            MAIDumbAgentRightCoop.COOK_GET_PLATE,
-            MAIDumbAgentRightCoop.DELIVER_SOUP
+        self.help_onion = {'name': 'onion', 'position': (5, 3)}
+        self.count_onions = 0
+        self.was_helped = False
+        self.count_helps = 0
+        start = [
+            'STOVE_TO_CENTER'
         ]
-        super().__init__(steps)
+        super().__init__(start, MAIDumbAgentRightCoop.STEPS)
+
+    def reset_smart(self, state):
+        self.curr_tick = -1
+        last_phase = self.phases[self.curr_phase]
+        if last_phase in ['STOVE_TO_CENTER', 'DELIVER_SOUP']:
+            if self._find_help_object(state.objects):
+                self.phases.append('GRAB_ONION_SHORT')
+            else:
+                self.phases.append('GRAB_ONION_LONG')
+        elif last_phase == 'GRAB_ONION_SHORT':
+            if state.players[1].held_object:
+                # TODO bot was helped by human!
+                self.phases.append('PLACE_ONION_STOVE')
+                self.count_helps += 1
+                self.was_helped = True
+            else:
+                self.phases.append('GRAB_ONION_LONG')
+        elif last_phase == 'GRAB_ONION_LONG':
+            if self.was_helped:
+                self.phases.append('PLACE_ONION_STOVE')
+                self.was_helped = False
+            else:
+                self.phases.append('PLACE_ONION_HELP')
+                self.phases.append('PLACE_ONION_STOVE')
+        elif last_phase == 'PLACE_ONION_STOVE':
+            self.count_onions += 1
+            if self.count_onions == 3:
+                self.phases.append('COOK_GET_PLATE')
+            else:
+                self.phases.append('STOVE_TO_CENTER')
+        elif last_phase == 'COOK_GET_PLATE':
+            self.count_onions = 0
+            self.phases.append('DELIVER_SOUP')
+        self.curr_phase += 1
+
+    def _find_help_object(self, objects):
+        obj = objects.get(self.help_onion['position'], None)
+        if obj and obj.to_dict()['name'] == self.help_onion['name']:
+            return True
+        return False
 
 
 class LITWOvercooked(CompetitiveOvercooked):

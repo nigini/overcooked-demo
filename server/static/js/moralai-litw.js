@@ -1,5 +1,7 @@
 // Persistent network connection that will be used to transmit real-time data
 let socket = io();
+
+// MAKE SURE that that "playerOne" is always the BOT!
 let games_config = {
     "tutorial": {
         "game_name" : "litw_tutorial",
