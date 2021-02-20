@@ -8,21 +8,29 @@ let games_config = {
         "layouts" : ["tutorial_0"],
         "playerZero" : "human",
         "playerOne" : "TutorialAI",
-        "onion_value" : 10
+        "mdp_params" : {
+            "delivery_reward" : 10,
+        }
     },
     "mai_left": {
         "game_name" : "litw_cook",
         "layouts" : ["mai_separate_coop_left"],
         "playerZero" : "human",
         "playerOne" : "right_coop",
-        "onion_value" : 10
+        "gameTime" : 60,
+        "mdp_params" : {
+            "delivery_reward" : 10,
+        }
     },
     "mai_right": {
         "game_name" : "litw_cook",
         "layouts" : ["mai_separate_coop_right"],
         "playerZero" : "human",
         "playerOne" : "left_coop",
-        "onion_value" : 10
+        "gameTime" : 60,
+        "mdp_params" : {
+            "delivery_reward" : 10,
+        }
     },
 };
 let study_timeline = [];

@@ -380,7 +380,8 @@ class OvercookedGame(Game):
         - _curr_game_over: Determines whether the game on the current mdp has ended
     """
 
-    def __init__(self, layouts=["cramped_room"], mdp_params={}, num_players=2, gameTime=30, playerZero='human', playerOne='human', showPotential=False, randomized=False, **kwargs):
+    def __init__(self, layouts=["cramped_room"], mdp_params={}, num_players=2, gameTime=30, playerZero='human',
+                 playerOne='human', showPotential=False, randomized=False, **kwargs):
         super(OvercookedGame, self).__init__(**kwargs)
         self.show_potential = showPotential
         self.mdp_params = mdp_params
@@ -678,13 +679,17 @@ class LITWTutorial(CompetitiveOvercooked):
                                                  playerOne=playerOne, showPotential=False, **kwargs)
         self.max_time = 0
         self.max_players = 2
-        self.ticks_per_ai_action = 8
+        self.ticks_per_ai_action = 10
+        self.delivery_reward = mdp_params.get('delivery_reward', None)
 
     @property
     def reset_timeout(self):
         return 1
 
     def _curr_game_over(self):
+        if self.delivery_reward:
+            # Two soups
+            return self.score[0] > self.delivery_reward
         return self.score[0] > 0
 
     def reset(self):
@@ -912,7 +917,7 @@ class LITWOvercooked(CompetitiveOvercooked):
     """
 
     def __init__(self, litw_uuid='-1', layouts=["mai_separate_coop_needed"],
-                 mdp_params={}, playerZero='human', playerOne='left_coop', **kwargs):
+                 mdp_params={}, playerZero='human', playerOne='left_coop', gameTime=30, **kwargs):
         self.ai = 'dummy'
         if not playerZero == 'human':
             self.ai = playerZero
@@ -920,9 +925,8 @@ class LITWOvercooked(CompetitiveOvercooked):
             self.ai = playerOne
         self.litw_uuid = litw_uuid
         super(LITWOvercooked, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
-                                                 playerOne=playerOne, showPotential=False, **kwargs)
+                                                 playerOne=playerOne, gameTime=gameTime, showPotential=False, **kwargs)
         self.trajectory = []
-        self.max_time = 30
         self.max_players = 2
         self.ticks_per_ai_action = 8
 
