@@ -227,49 +227,49 @@ function load_template(template_name) {
 }
 
 function configure_study() {
-    // study_timeline.push({
-    //     name: "tutorial1",
-    //     type: "display-slide",
-    //     template: templates.tutorial1.template,
-    //     display_element: $("#tutorial"),
-    //     show_next: true
-    // });
-    // study_timeline.push({
-    //     name: "tutorial2",
-    //     type: "display-slide",
-    //     template: templates.tutorial2.template,
-    //     display_element: $("#tutorial"),
-    //     show_next: false,
-    //     setup: function (){
-    //         start_game('tutorial');
-    //     }
-    // });
-    // study_timeline.push({
-    //     name: "tutorial3",
-    //     type: "display-slide",
-    //     template: templates.tutorial3.template,
-    //     display_element: $("#tutorial"),
-    //     show_next: false,
-    //     setup: function (){
-    //         start_game('tutorial_coop');
-    //     }
-    // });
-    // study_timeline.push({
-    //     name: "round1-instructions",
-    //     type: "display-slide",
-    //     display_element: $("#round-instructions"),
-    //     show_next: true,
-    //     template: templates.rounds_inst.template,
-    //     template_data: {
-    //         'header': $.i18n('litw-round-1-inst-header'),
-    //         'instructions':[
-    //             $.i18n('litw-round-1-inst-p1'),
-    //             $.i18n('litw-round-1-inst-p2'),
-    //             $.i18n('litw-round-1-inst-p3'),
-    //             $.i18n('litw-round-1-inst-p4')
-    //         ]
-    //     }
-    // });
+    study_timeline.push({
+        name: "tutorial1",
+        type: "display-slide",
+        template: templates.tutorial1.template,
+        display_element: $("#tutorial"),
+        show_next: true
+    });
+    study_timeline.push({
+        name: "tutorial2",
+        type: "display-slide",
+        template: templates.tutorial2.template,
+        display_element: $("#tutorial"),
+        show_next: false,
+        setup: function (){
+            start_game('tutorial');
+        }
+    });
+    study_timeline.push({
+        name: "tutorial3",
+        type: "display-slide",
+        template: templates.tutorial3.template,
+        display_element: $("#tutorial"),
+        show_next: false,
+        setup: function (){
+            start_game('tutorial_coop');
+        }
+    });
+    study_timeline.push({
+        name: "round1-instructions",
+        type: "display-slide",
+        display_element: $("#round-instructions"),
+        show_next: true,
+        template: templates.rounds_inst.template,
+        template_data: {
+            'header': $.i18n('litw-round-1-inst-header'),
+            'instructions':[
+                $.i18n('litw-round-1-inst-p1'),
+                $.i18n('litw-round-1-inst-p2'),
+                $.i18n('litw-round-1-inst-p3'),
+                $.i18n('litw-round-1-inst-p4')
+            ]
+        }
+    });
     study_timeline.push({
         name: "round1",
         type: "display-slide",
