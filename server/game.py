@@ -699,6 +699,32 @@ class LITWTutorial(CompetitiveOvercooked):
         return TutorialAI()
 
 
+class LITWTutorialCoop(CompetitiveOvercooked):
+    """
+    Wrapper on OvercookedGame that includes additional data for the MORAL_AI LITW study mechanics
+    """
+
+    def __init__(self, layouts=["tutorial_0_coop"], mdp_params={}, playerZero='human', playerOne='AI', **kwargs):
+        super(LITWTutorialCoop, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
+                                                 playerOne=playerOne, showPotential=False, **kwargs)
+        self.max_time = 0
+        self.max_players = 2
+        self.ticks_per_ai_action = 10
+
+    @property
+    def reset_timeout(self):
+        return 1
+
+    def _curr_game_over(self):
+        return self.score[0] > 0 and self.score[1] > 0
+
+    def reset(self):
+        print("RESET TUTORIAL COOP!")
+
+    def get_policy(self, *args, **kwargs):
+        return MAIDumbAgentTutorial()
+
+
 class MAIDumbAgent:
     def __init__(self, sequence=[], steps={}):
         self.curr_phase = -1
@@ -903,6 +929,73 @@ class MAIDumbAgentRightCoop(MAIDumbAgent):
         if obj and obj.to_dict()['name'] == self.help_onion['name']:
             return True
         return False
+
+
+class MAIDumbAgentTutorial(MAIDumbAgent):
+    STEPS = {
+        'HELP_PLATE': [
+            Direction.WEST,
+            Direction.NORTH,
+            Action.INTERACT,
+            Direction.SOUTH,
+            Action.INTERACT,
+            Direction.WEST
+        ],
+        'WAIT_ONION': [
+            Direction.WEST,
+            Direction.SOUTH,
+            Action.INTERACT
+        ],
+        'DELIVER_ONION': [
+            Direction.EAST,
+            Direction.NORTH,
+            Action.INTERACT
+        ],
+        'COOK_GET_PLATE': [
+            Action.INTERACT,
+            Direction.EAST,
+            Direction.NORTH,
+            Action.INTERACT,
+            Direction.WEST,
+            Direction.NORTH,
+            Action.INTERACT
+        ],
+        'DELIVER_SOUP': [
+            Direction.EAST,
+            Direction.EAST,
+            Direction.EAST,
+            Action.INTERACT
+        ]
+    }
+
+    def __init__(self):
+        self.help_onion = {'name': 'onion', 'position': (1, 2)}
+        self.count_onions = 0
+        self.was_helped = False
+        start = [
+            'HELP_PLATE',
+            'WAIT_ONION'
+        ]
+        super().__init__(start, MAIDumbAgentTutorial.STEPS)
+
+    def reset_smart(self, state):
+        self.curr_tick = -1
+        last_phase = self.phases[self.curr_phase]
+        if last_phase == 'WAIT_ONION':
+            if state.players[1].held_object:
+                self.phases.append('DELIVER_ONION')
+            else:
+                self.phases.append('WAIT_ONION')
+        elif last_phase == 'DELIVER_ONION':
+            self.count_onions += 1
+            if self.count_onions == 3:
+                self.phases.append('COOK_GET_PLATE')
+            else:
+                self.phases.append('WAIT_ONION')
+        elif last_phase == 'COOK_GET_PLATE':
+            self.count_onions = 0
+            self.phases.append('DELIVER_SOUP')
+        self.curr_phase += 1
 
 
 class LITWOvercooked(CompetitiveOvercooked):
