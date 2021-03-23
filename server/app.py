@@ -14,7 +14,7 @@ from flask_socketio import SocketIO, join_room, leave_room, emit
 from game import OvercookedGame, OvercookedTutorial, Game, CompetitiveOvercooked, LITWOvercooked, \
     LITWTutorial, LITWTutorialCoop
 import game
-
+from litw import DataProxy
 
 ### Thoughts -- where I'll log potential issues/ideas as they come up
 # Should make game driver code more error robust -- if overcooked randomlly errors we should catch it and report it to user
@@ -90,6 +90,14 @@ GAME_NAME_TO_CLS = {
 
 game._configure(MAX_GAME_LENGTH, AGENT_DIR)
 
+#######################
+# LITW Configuration #
+#######################
+LITW_CONFIG = CONFIG['litw']
+if LITW_CONFIG:
+    litw_data = DataProxy(LITW_CONFIG)
+else:
+    litw_data = False
 
 
 
@@ -328,56 +336,30 @@ def get_agent_names():
 # Application routes #
 ######################
 
-# Hitting each of these endpoints creates a brand new socket that is closed 
-# at after the server response is received. Standard HTTP protocol
-
 @app.route('/play')
 def index():
     agent_names = get_agent_names()
     return render_template('index.html', agent_names=agent_names, layouts=LAYOUTS)
 
+
 @app.route('/litw')
 def litw():
     return render_template('litw.html')
 
-@app.route('/debug')
-def debug():
-    resp = {}
-    games = []
-    active_games = []
-    waiting_games = []
-    users = []
-    free_ids = []
-    free_map = {}
-    for game_id in ACTIVE_GAMES:
-        game = get_game(game_id)
-        active_games.append({"id" : game_id, "state" : game.to_json()})
 
-    for game_id in list(WAITING_GAMES.queue):
-        game = get_game(game_id)
-        game_state = None if FREE_MAP[game_id] else game.to_json()
-        waiting_games.append({ "id" : game_id, "state" : game_state})
+@app.route('/data', methods=['PUT'])
+def save_data():
+    data = request.get_json()
+    if data:
+        if 'user_id' in data and 'study_data' in data:
+            if litw_data:
+                saved = litw_data.save_data(data['user_id'], data['study_data'])
+                if saved:
+                    return 200
+            return 'Could not save your data!', 500
+    else:
+        return 'Expected JSON data: {user_id: ??, study_data: {...}}.', 400
 
-    for game_id in GAMES:
-        games.append(game_id)
-
-    for user_id in USER_ROOMS:
-        users.append({ user_id : get_curr_room(user_id) })
-
-    for game_id in list(FREE_IDS.queue):
-        free_ids.append(game_id)
-
-    for game_id in FREE_MAP:
-        free_map[game_id] = FREE_MAP[game_id]
-
-    
-    resp['active_games'] = active_games
-    resp['waiting_games'] = waiting_games
-    resp['all_games'] = games
-    resp['users'] = users
-    resp['free_ids'] = free_ids
-    resp['free_map'] = free_map
-    return jsonify(resp)
 
 
 #########################

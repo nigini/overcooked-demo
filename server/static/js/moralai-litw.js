@@ -227,33 +227,33 @@ function load_template(template_name) {
 }
 
 function configure_study() {
-    study_timeline.push({
-        name: "tutorial1",
-        type: "display-slide",
-        template: templates.tutorial1.template,
-        display_element: $("#tutorial"),
-        show_next: true
-    });
-    study_timeline.push({
-        name: "tutorial2",
-        type: "display-slide",
-        template: templates.tutorial2.template,
-        display_element: $("#tutorial"),
-        show_next: false,
-        setup: function (){
-            start_game('tutorial');
-        }
-    });
-    study_timeline.push({
-        name: "tutorial3",
-        type: "display-slide",
-        template: templates.tutorial3.template,
-        display_element: $("#tutorial"),
-        show_next: false,
-        setup: function (){
-            start_game('tutorial_coop');
-        }
-    });
+    // study_timeline.push({
+    //     name: "tutorial1",
+    //     type: "display-slide",
+    //     template: templates.tutorial1.template,
+    //     display_element: $("#tutorial"),
+    //     show_next: true
+    // });
+    // study_timeline.push({
+    //     name: "tutorial2",
+    //     type: "display-slide",
+    //     template: templates.tutorial2.template,
+    //     display_element: $("#tutorial"),
+    //     show_next: false,
+    //     setup: function (){
+    //         start_game('tutorial');
+    //     }
+    // });
+    // study_timeline.push({
+    //     name: "tutorial3",
+    //     type: "display-slide",
+    //     template: templates.tutorial3.template,
+    //     display_element: $("#tutorial"),
+    //     show_next: false,
+    //     setup: function (){
+    //         start_game('tutorial_coop');
+    //     }
+    // });
     study_timeline.push({
         name: "round1-instructions",
         type: "display-slide",
@@ -267,7 +267,8 @@ function configure_study() {
                 $.i18n('litw-round-1-inst-p2'),
                 $.i18n('litw-round-1-inst-p3'),
                 $.i18n('litw-round-1-inst-p4')
-            ]
+            ],
+            'image': '/static/images/rounds/round-layout1.png'
         }
     });
     study_timeline.push({
@@ -294,6 +295,7 @@ function configure_study() {
         priv_instruction_key = 'litw-round-2-inst-p2-npriv';
         round_2_conf = 'mai_right';
     }
+
     study_timeline.push({
         name: "round2-instructions",
         type: "display-slide",
@@ -307,7 +309,8 @@ function configure_study() {
                 $.i18n(priv_instruction_key),
                 $.i18n('litw-round-2-inst-p3'),
                 $.i18n('litw-round-2-inst-p4')
-            ]
+            ],
+            'image': '/static/images/rounds/round-layout1.png'
         }
     });
     study_timeline.push({
@@ -325,8 +328,40 @@ function configure_study() {
         }
     });
     study_timeline.push({
-       type: "call-function",
-       func: function(){
+        name: "round3-instructions",
+        type: "display-slide",
+        display_element: $("#round-instructions"),
+        show_next: true,
+        template: templates.rounds_inst.template,
+        template_data: {
+            'header': $.i18n('litw-round-3-inst-header'),
+            'instructions':[
+                $.i18n('litw-round-3-inst-p1'),
+                $.i18n('litw-round-3-inst-p2'),
+                $.i18n('litw-round-3-inst-p3'),
+                $.i18n('litw-round-3-inst-p4')
+            ],
+            'image': '/static/images/rounds/round-layout1.png'
+        }
+    });
+    study_timeline.push({
+        name: "round3",
+        type: "display-slide",
+        display_element: $("#round-game"),
+        show_next: false,
+        template: templates.rounds.template,
+        template_data: {
+            'header': $.i18n('litw-round-3-header')
+        },
+        setup: function (){
+            study_data.games.push({name: 'round3'});
+            start_game('mai_left');
+        }
+    });
+    study_timeline.push({
+        name: "download-data",
+        type: "call-function",
+        func: function(){
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(study_data));
             let downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
@@ -334,7 +369,7 @@ function configure_study() {
             document.body.appendChild(downloadAnchorNode); // required for firefox
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
-       }
+        }
     });
 }
 

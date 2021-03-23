@@ -156,7 +156,6 @@ class Game(ABC):
         """
         return False
 
-
     def tick(self):
         """
         Updates the game state by applying each of the pending actions. This is done so that players cannot directly modify
@@ -266,7 +265,6 @@ class Game(ABC):
             return False
         else:
             return True
-
 
     def clear_pending_actions(self):
         """
@@ -582,7 +580,7 @@ class OvercookedGame(Game):
             try:
                 # Loading rllib agents requires additional helpers
                 fpath = os.path.join(AGENT_DIR, npc_id, 'agent', 'agent')
-                agent =  load_agent(fpath, agent_index=idx)
+                agent = load_agent(fpath, agent_index=idx)
                 return agent
             except Exception as e:
                 raise IOError("Error loading Rllib Agent\n{}".format(e.__repr__()))

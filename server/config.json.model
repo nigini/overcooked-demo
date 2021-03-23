@@ -12,5 +12,12 @@
         "tomato_time" : 10,
         "order_bonus" : 2,
         "max_num_ingredients" : 3
+    },
+    "litw": {
+        "url_server": "https://data.labinthewild.org/v1/",
+        "url_auth": "auth/?study_id={}&study_key={}",
+        "url_data": "study/{}/data/",
+        "study_id": "",
+        "study_key": ""
     }
 }
