@@ -350,15 +350,16 @@ def litw():
 @app.route('/data', methods=['PUT'])
 def save_data():
     data = request.get_json()
+    print(data)
     if data:
-        if 'user_id' in data and 'study_data' in data:
+        if 'user_id' in data and 'data_type' in data:
             if litw_data:
-                saved = litw_data.save_data(data['user_id'], data['study_data'])
+                saved = litw_data.save_data(data)
                 if saved:
-                    return 200
+                    return 'Data successfully save.', 200
             return 'Could not save your data!', 500
     else:
-        return 'Expected JSON data: {user_id: ??, study_data: {...}}.', 400
+        return 'Expected JSON data: {user_id: ??, data_type: ??, ...}.', 400
 
 
 

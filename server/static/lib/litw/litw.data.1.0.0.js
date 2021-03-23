@@ -1,5 +1,5 @@
 /*************************************************************
- * litw.data.noapi.1.0.js
+ * litw.data.1.0.0js
  *
  * Contains functions for writing LITW Study data operations
  * using the LITW REST API
@@ -8,7 +8,7 @@
  *
  * Author: LabintheWild DEV crew
  *
- * © Copyright 2020 LabintheWild
+ * © Copyright 2021 LabintheWild
  * For questions about this file and permission to use
  * the code, contact us at info@labinthewild.org
  *************************************************************/
@@ -66,7 +66,7 @@
             if (!params._isInitialized) {
                 initialize();
             }
-            data.uuid = getParticipantId();
+            data.user_id = getParticipantId();
             data.data_type = dataType;
             _submit(data, false);
         },
@@ -85,12 +85,16 @@
 
         _submit = function(obj_data, finalAttempt) {
             //console.log(JSON.stringify(obj_data));
-            $.post("include/save_data.php", JSON.stringify(obj_data) )
-                .fail(function(e) {
-                    if (!finalAttempt) {
-                        _submit(obj_data, true);
-                    }
-                });
+            $.ajax({
+                url: 'data',
+                type: 'PUT',
+                data: JSON.stringify(obj_data),
+                contentType: 'application/json'
+            }).fail(function(e) {
+                if (!finalAttempt) {
+                    _submit(obj_data, true);
+                }
+            });
         }
 
     /**** PUBLIC METHODS ****/

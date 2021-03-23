@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 from datetime import datetime, timezone
 
 
@@ -30,26 +31,29 @@ class DataProxy:
         response = requests.get(url.format(self.study_id, self.study_key))
         if response.status_code == 200:
             try:
-                self.litw_token = json.load(response.json())
-            except:
+                self.litw_token = response.json()
+            except Exception as e:
+                logging.error('[LITW TOKEN]: {}'.format(e))
                 self.litw_token = None
-        self.litw_token = None
+        else:
+            self.litw_token = None
 
-    def save_data(self, user_id, study_data, refresh_token=True):
+    def save_data(self, study_data, refresh_token=True):
         if not self._is_token_valid():
             if refresh_token:
                 self._refresh_litw_token()
-                return self.save_data(user_id, study_data, False)
+                return self.save_data(study_data, False)
             else:
                 return False
         else:
-            url = self.url_server + self.url_data.format(study_data)
+            url = self.url_server + self.url_data.format(self.study_id)
             headers = {
                 'Authorization': 'Bearer {}'.format(self.litw_token['access_token']),
-                'content_type': 'application/json'
+                'content-type': 'application/json'
             }
             response = requests.put(url, data=json.dumps(study_data), headers=headers)
             if response.status_code == 200:
                 return True
             else:
+                logging.error('[LITW SAVE]: {}'.format(response))
                 return False
