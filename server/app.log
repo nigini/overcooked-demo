@@ -66,3 +66,323 @@ Traceback (most recent call last):
   File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 516, in send
     raise ConnectionError(e, request=request)
 requests.exceptions.ConnectionError: HTTPSConnectionPool(host='data.labinthewild.org', port=443): Max retries exceeded with url: /v1/auth/?study_id=&study_key= (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f39c8d36550>: Failed to establish a new connection: [Errno -2] No address found'))
+Exception on /data [PUT]
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 159, in _new_conn
+    conn = connection.create_connection(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 84, in create_connection
+    raise err
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 74, in create_connection
+    sock.connect(sa)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 253, in connect
+    socket_checkerr(fd)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 51, in socket_checkerr
+    raise socket.error(err, errno.errorcode[err])
+ConnectionRefusedError: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 670, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 392, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.8/http/client.py", line 1255, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1301, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1250, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1010, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.8/http/client.py", line 950, in send
+    self.connect()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 187, in connect
+    conn = self._new_conn()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 171, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f57a2c44100>: Failed to establish a new connection: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 726, in urlopen
+    retries = retries.increment(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/retry.py", line 439, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2c44100>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "app.py", line 357, in save_data
+    saved = litw_data.save_data(data)
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 44, in save_data
+    self._refresh_litw_token()
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 31, in _refresh_litw_token
+    response = requests.get(url.format(self.study_id, self.study_key))
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 76, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 61, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 530, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 643, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2c44100>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))
+Exception on /data [PUT]
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 159, in _new_conn
+    conn = connection.create_connection(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 84, in create_connection
+    raise err
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 74, in create_connection
+    sock.connect(sa)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 253, in connect
+    socket_checkerr(fd)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 51, in socket_checkerr
+    raise socket.error(err, errno.errorcode[err])
+ConnectionRefusedError: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 670, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 392, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.8/http/client.py", line 1255, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1301, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1250, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1010, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.8/http/client.py", line 950, in send
+    self.connect()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 187, in connect
+    conn = self._new_conn()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 171, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f57a2b91850>: Failed to establish a new connection: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 726, in urlopen
+    retries = retries.increment(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/retry.py", line 439, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2b91850>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "app.py", line 357, in save_data
+    saved = litw_data.save_data(data)
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 44, in save_data
+    self._refresh_litw_token()
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 31, in _refresh_litw_token
+    response = requests.get(url.format(self.study_id, self.study_key))
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 76, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 61, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 530, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 643, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2b91850>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))
+Exception on /data [PUT]
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 159, in _new_conn
+    conn = connection.create_connection(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 84, in create_connection
+    raise err
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 74, in create_connection
+    sock.connect(sa)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 253, in connect
+    socket_checkerr(fd)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 51, in socket_checkerr
+    raise socket.error(err, errno.errorcode[err])
+ConnectionRefusedError: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 670, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 392, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.8/http/client.py", line 1255, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1301, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1250, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1010, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.8/http/client.py", line 950, in send
+    self.connect()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 187, in connect
+    conn = self._new_conn()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 171, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f57a2b91220>: Failed to establish a new connection: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 726, in urlopen
+    retries = retries.increment(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/retry.py", line 439, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2b91220>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "app.py", line 357, in save_data
+    saved = litw_data.save_data(data)
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 44, in save_data
+    self._refresh_litw_token()
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 31, in _refresh_litw_token
+    response = requests.get(url.format(self.study_id, self.study_key))
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 76, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 61, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 530, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 643, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2b91220>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))
+Exception on /data [PUT]
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 159, in _new_conn
+    conn = connection.create_connection(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 84, in create_connection
+    raise err
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/connection.py", line 74, in create_connection
+    sock.connect(sa)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 253, in connect
+    socket_checkerr(fd)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/eventlet/greenio/base.py", line 51, in socket_checkerr
+    raise socket.error(err, errno.errorcode[err])
+ConnectionRefusedError: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 670, in urlopen
+    httplib_response = self._make_request(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 392, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.8/http/client.py", line 1255, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1301, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1250, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.8/http/client.py", line 1010, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.8/http/client.py", line 950, in send
+    self.connect()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 187, in connect
+    conn = self._new_conn()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connection.py", line 171, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7f57a2c2ab50>: Failed to establish a new connection: [Errno 111] ECONNREFUSED
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 439, in send
+    resp = conn.urlopen(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/connectionpool.py", line 726, in urlopen
+    retries = retries.increment(
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/urllib3/util/retry.py", line 439, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2c2ab50>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "app.py", line 357, in save_data
+    saved = litw_data.save_data(data)
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 44, in save_data
+    self._refresh_litw_token()
+  File "/home/nigini/Workspace/MORAL-AI/GAMES/OVERCOOKED-AI/overcooked-demo/server/litw.py", line 31, in _refresh_litw_token
+    response = requests.get(url.format(self.study_id, self.study_key))
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 76, in get
+    return request('get', url, params=params, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/api.py", line 61, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 530, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/sessions.py", line 643, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/nigini/Workspace/VENV/OVERCOOKED/lib/python3.8/site-packages/requests/adapters.py", line 516, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='0.0.0.0', port=7777): Max retries exceeded with url: /v1/auth/?study_id=d90b1e0d-92ae-4d97-82c1-9367ec33cd40&study_key=WQpNZOMyUxVKAZnt20C3jPl_UJKwWwqgWrboWEWNivo (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f57a2c2ab50>: Failed to establish a new connection: [Errno 111] ECONNREFUSED'))

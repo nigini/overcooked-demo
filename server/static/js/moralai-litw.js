@@ -44,6 +44,14 @@ let games_config = {
 };
 let study_timeline = [];
 let templates = {
+    consent: {
+        resource: 'static/templates/litw-consent.html',
+        template: null
+    },
+    demographics: {
+        resource: 'static/templates/litw-demographics.html',
+        template: null
+    },
     tutorial1: {
         resource: 'static/templates/litw-tutorial-step1.html',
         template: null
@@ -96,11 +104,8 @@ socket.on('reset_game', function(data) {
     let game_data = data.data;
     graphics_end();
     disable_key_listener();
-    let size = study_data.games.length;
-    if(size>0) {
-        study_data.games[size-1].data = game_data;
-    }
-    jsPsych.finishTrial();
+    setLastGameData(game_data);
+    $('#btn-next-page').click();
 });
 
 socket.on('state_pong', function(data) {
@@ -142,6 +147,21 @@ function end_game(data) {
     console.log("END_STUDY: " + JSON.stringify(data));
 }
 
+function setLastGameData(game_data) {
+    let size = study_data.games.length;
+    if(size>0) {
+        study_data.games[size-1].data = game_data;
+    }
+}
+
+function getLastGameData() {
+    let size = study_data.games.length;
+    if(size>0) {
+        return study_data.games[size - 1].data;
+    } else {
+        return null;
+    }
+}
 
 /* Game Key Event Listener */
 
@@ -220,6 +240,13 @@ function start_study(){
 }
 
 function load_template(template_name) {
+    Handlebars.registerHelper('times', function(n, block) {
+        let accum = '';
+        for(let i = 1; i <= n; ++i)
+            accum += block.fn(i);
+        return accum;
+    });
+
     return $.get(templates[template_name].resource, function(html){
         templates[template_name].template = Handlebars.compile(html);
         console.log(`LOADED ${JSON.stringify(templates[template_name].template)}`);
@@ -227,33 +254,47 @@ function load_template(template_name) {
 }
 
 function configure_study() {
-    // study_timeline.push({
-    //     name: "tutorial1",
-    //     type: "display-slide",
-    //     template: templates.tutorial1.template,
-    //     display_element: $("#tutorial"),
-    //     show_next: true
-    // });
-    // study_timeline.push({
-    //     name: "tutorial2",
-    //     type: "display-slide",
-    //     template: templates.tutorial2.template,
-    //     display_element: $("#tutorial"),
-    //     show_next: false,
-    //     setup: function (){
-    //         start_game('tutorial');
-    //     }
-    // });
-    // study_timeline.push({
-    //     name: "tutorial3",
-    //     type: "display-slide",
-    //     template: templates.tutorial3.template,
-    //     display_element: $("#tutorial"),
-    //     show_next: false,
-    //     setup: function (){
-    //         start_game('tutorial_coop');
-    //     }
-    // });
+    study_timeline.push({
+        name: "informed_consent",
+        type: "display-slide",
+        template: templates.consent.template,
+        display_element: $("#informed_consent"),
+        show_next: false
+    });
+    study_timeline.push({
+        name: "demographics",
+        type: "display-slide",
+        template: templates.demographics.template,
+        display_element: $("#demographics"),
+        show_next: false
+    });
+    study_timeline.push({
+        name: "tutorial1",
+        type: "display-slide",
+        template: templates.tutorial1.template,
+        display_element: $("#tutorial"),
+        show_next: true
+    });
+    study_timeline.push({
+        name: "tutorial2",
+        type: "display-slide",
+        template: templates.tutorial2.template,
+        display_element: $("#tutorial"),
+        show_next: false,
+        setup: function (){
+            start_game('tutorial');
+        }
+    });
+    study_timeline.push({
+        name: "tutorial3",
+        type: "display-slide",
+        template: templates.tutorial3.template,
+        display_element: $("#tutorial"),
+        show_next: false,
+        setup: function (){
+            start_game('tutorial_coop');
+        }
+    });
     study_timeline.push({
         name: "round1-instructions",
         type: "display-slide",
@@ -284,7 +325,9 @@ function configure_study() {
             study_data.games.push({name: 'round1'});
             start_game('mai_left');
         },
-
+        finish: function (){
+            LITW.data.submitStudyData(getLastGameData());
+        }
     });
 
     let privileged = Math.random() >= .5;
@@ -325,6 +368,9 @@ function configure_study() {
         setup: function (){
             study_data.games.push({name: 'round2'});
             start_game(round_2_conf);
+        },
+        finish: function (){
+            LITW.data.submitStudyData(getLastGameData());
         }
     });
     study_timeline.push({
@@ -356,6 +402,9 @@ function configure_study() {
         setup: function (){
             study_data.games.push({name: 'round3'});
             start_game('mai_left');
+        },
+        finish: function (){
+            LITW.data.submitStudyData(getLastGameData());
         }
     });
     study_timeline.push({
