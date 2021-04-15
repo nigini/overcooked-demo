@@ -9,9 +9,8 @@ WORKDIR /app
 
 # Install non-chai dependencies
 
-RUN pip install tensorflow==2.3.1 --no-cache-dir
 COPY ./requirements.txt ./requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --no-cache-dir
 
 # Install eventlet production server if production build
 RUN if [ "$BUILD_ENV" = "production" ] ; then pip install eventlet ; fi
