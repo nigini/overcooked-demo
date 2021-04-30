@@ -724,11 +724,14 @@ class LITWTutorialCoop(CompetitiveOvercooked):
 
 
 class MAIDumbAgent:
-    def __init__(self, sequence=[], steps={}):
+    def __init__(self, sequence=[], steps={}, help_obj={'name': 'onion', 'position': (5, 3)}):
         self.curr_phase = -1
         self.curr_tick = -1
         self.phases = sequence
         self.formulas = steps
+        self.received_coop = 0
+        self.provided_coop = 0
+        self.help_obj = help_obj
 
     def action(self, state):
         self.curr_tick += 1
@@ -752,6 +755,18 @@ class MAIDumbAgent:
 
     def reset_smart(self, state):
         self.reset()
+
+    def get_coop_count(self):
+        return {
+            "received": self.received_coop,
+            "provided": self.provided_coop
+        }
+
+    def _find_help_object(self, objects):
+        obj = objects.get(self.help_obj['position'], None)
+        if obj and obj.to_dict()['name'] == self.help_obj['name']:
+            return True
+        return False
 
 
 class MAIDumbAgentLeftCoop(MAIDumbAgent):
@@ -796,6 +811,7 @@ class MAIDumbAgentLeftCoop(MAIDumbAgent):
     }
 
     def __init__(self):
+        self.help_provided = False
         sequence = [
             'GRAB_ONION_LONG',
             'PLACE_ONION_HELP',
@@ -810,6 +826,15 @@ class MAIDumbAgentLeftCoop(MAIDumbAgent):
             'DELIVER_SOUP'
         ]
         super().__init__(sequence, MAIDumbAgentLeftCoop.STEPS)
+
+    def reset_smart(self, state):
+        last_phase = self.phases[self.curr_phase]
+        if last_phase in ['PLACE_ONION_HELP']:
+            self.help_provided = True
+        if (not self._find_help_object(state.objects)) and self.help_provided:
+            self.help_provided = False
+            self.provided_coop += 1
+        super(MAIDumbAgentLeftCoop, self).reset_smart(state)
 
 
 class MAIDumbAgentRightCoop(MAIDumbAgent):
@@ -879,7 +904,6 @@ class MAIDumbAgentRightCoop(MAIDumbAgent):
     }
 
     def __init__(self):
-        self.help_onion = {'name': 'onion', 'position': (5, 3)}
         self.count_onions = 0
         self.was_helped = False
         self.count_helps = 0
@@ -898,7 +922,7 @@ class MAIDumbAgentRightCoop(MAIDumbAgent):
                 self.phases.append('GRAB_ONION_LONG')
         elif last_phase == 'GRAB_ONION_SHORT':
             if state.players[1].held_object:
-                # TODO bot was helped by human!
+                self.received_coop += 1
                 self.phases.append('PLACE_ONION_STOVE')
                 self.count_helps += 1
                 self.was_helped = True
@@ -921,12 +945,6 @@ class MAIDumbAgentRightCoop(MAIDumbAgent):
             self.count_onions = 0
             self.phases.append('DELIVER_SOUP')
         self.curr_phase += 1
-
-    def _find_help_object(self, objects):
-        obj = objects.get(self.help_onion['position'], None)
-        if obj and obj.to_dict()['name'] == self.help_onion['name']:
-            return True
-        return False
 
 
 class MAIDumbAgentTutorial(MAIDumbAgent):
@@ -1014,6 +1032,7 @@ class LITWOvercooked(CompetitiveOvercooked):
             self.ai = playerZero
         elif not playerOne == 'human':
             self.ai = playerOne
+        self.mai_agent = self.LITW_AGENTS[self.ai]()
         self.litw_uuid = litw_uuid
         super(LITWOvercooked, self).__init__(layouts=layouts, mdp_params=mdp_params, playerZero=playerZero,
                                                  playerOne=playerOne, gameTime=gameTime, showPotential=False, **kwargs)
@@ -1032,10 +1051,7 @@ class LITWOvercooked(CompetitiveOvercooked):
         super(LITWOvercooked, self).reset()
 
     def get_policy(self, *args, **kwargs):
-        if self.ai in self.LITW_AGENTS:
-            return self.LITW_AGENTS[self.ai]()
-        else:
-            return MAIDumbAgent()
+        return self.mai_agent
 
     def apply_actions(self):
         """
@@ -1043,7 +1059,9 @@ class LITWOvercooked(CompetitiveOvercooked):
         """
         # Apply MDP logic
         prev_state, joint_action, info = super(LITWOvercooked, self).apply_actions()
-
+        agent_coop_count = {}
+        if self.mai_agent:
+            agent_coop_count = self.mai_agent.get_coop_count()
         transition = {
             "state": prev_state.to_dict(),
             "joint_action": joint_action,
@@ -1051,6 +1069,7 @@ class LITWOvercooked(CompetitiveOvercooked):
             "score": self.score[:],
             "time_elapsed": time() - self.start_time,
             "cur_gameloop": self.curr_tick,
+            "agent_coop_count": agent_coop_count
         }
         self.trajectory.append(transition)
 
@@ -1058,6 +1077,10 @@ class LITWOvercooked(CompetitiveOvercooked):
         """
         Returns and then clears the accumulated trajectory
         """
+        agent_coop_count = {}
+        if self.mai_agent:
+            agent_coop_count = self.mai_agent.get_coop_count()
+
         data = {
             "litw_uuid": self.litw_uuid,
             "layout": self.mdp.terrain_mtx,
@@ -1066,7 +1089,9 @@ class LITWOvercooked(CompetitiveOvercooked):
             "player_1_id": self.players[1],
             "player_0_is_human": self.players[0] in self.human_players,
             "player_1_is_human": self.players[1] in self.human_players,
-            "trajectory": self.trajectory
+            "trajectory": self.trajectory,
+            "score": self.score[:],
+            "agent_coop_count": agent_coop_count
         }
         self.trajectory = []
         return data

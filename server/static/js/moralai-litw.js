@@ -71,6 +71,18 @@ let templates = {
     rounds: {
         resource: 'static/templates/litw-round.html',
         template: null
+    },
+    comments: {
+        resource: 'static/templates/litw-comments.html',
+        template: null
+    },
+    results: {
+        resource: 'static/templates/litw-results.html',
+        template: null
+    },
+    results_footer: {
+        resource: 'static/templates/litw-results-footer.html',
+        template: null
     }
 };
 let study_data = {};
@@ -330,14 +342,14 @@ function configure_study() {
         }
     });
 
-    let privileged = Math.random() >= .5;
-    study_data.privileged = privileged;
-    let priv_instruction_key = 'litw-round-2-inst-p2-priv';
-    let round_2_conf = 'mai_left';
-    if(!privileged) {
-        priv_instruction_key = 'litw-round-2-inst-p2-npriv';
-        round_2_conf = 'mai_right';
-    }
+    // let privileged = Math.random() >= .5;
+    // study_data.privileged = privileged;
+    // let priv_instruction_key = 'litw-round-2-inst-p2-priv';
+    // let round_2_conf = 'mai_left';
+    // if(!privileged) {
+    //     priv_instruction_key = 'litw-round-2-inst-p2-npriv';
+    //     round_2_conf = 'mai_right';
+    // }
 
     study_timeline.push({
         name: "round2-instructions",
@@ -349,13 +361,14 @@ function configure_study() {
             'header': $.i18n('litw-round-2-inst-header'),
             'instructions':[
                 $.i18n('litw-round-2-inst-p1'),
-                $.i18n(priv_instruction_key),
+                $.i18n('litw-round-2-inst-p2-npriv'),
                 $.i18n('litw-round-2-inst-p3'),
                 $.i18n('litw-round-2-inst-p4')
             ],
             'image': '/static/images/rounds/round-layout1.png'
         }
     });
+
     study_timeline.push({
         name: "round2",
         type: "display-slide",
@@ -367,12 +380,13 @@ function configure_study() {
         },
         setup: function (){
             study_data.games.push({name: 'round2'});
-            start_game(round_2_conf);
+            start_game('mai_right');
         },
         finish: function (){
             LITW.data.submitStudyData(getLastGameData());
         }
     });
+
     study_timeline.push({
         name: "round3-instructions",
         type: "display-slide",
@@ -407,6 +421,22 @@ function configure_study() {
             LITW.data.submitStudyData(getLastGameData());
         }
     });
+
+    study_timeline.push({
+        name: "comments",
+        type: "display-slide",
+        display_element: $("#comments"),
+        show_next: true,
+        template: templates.comments.template,
+        finish: function(){
+            let comments = $('#commentsForm').alpaca().getValue();
+            if (Object.keys(comments).length > 0) {
+                comments['time_elapsed'] = getSlideTime();
+                LITW.data.submitComments(comments);
+            }
+        }
+    });
+
     study_timeline.push({
         name: "download-data",
         type: "call-function",
@@ -420,6 +450,85 @@ function configure_study() {
             downloadAnchorNode.remove();
         }
     });
+
+    study_timeline.push({
+        name: "results",
+        type: "call-function",
+        func: showResults
+    });
+}
+
+function getSlideTime() {
+    let data_size = jsPsych.data.getData().length;
+    if( data_size > 0 ) {
+        return jsPsych.totalTime() - jsPsych.data.getLastTrialData().time_elapsed;
+    } else {
+        return jsPsych.totalTime();
+    }
+}
+
+function showResults(){
+    if (study_data.games.length < 3){
+        //FAKE DATA FOR TESTING
+        let fake_data = {
+            score: [20,10],
+            agent_coop_count: {
+                received: 5,
+                provided: 5
+            }
+        }
+        for(let size=study_data.games.length; size<3; size++) {
+            study_data.games.push({data: JSON.parse(JSON.stringify(fake_data))});
+        }
+    }
+    let template_data = {
+        message: $.i18n('litw-result-thanks')
+    }
+    console.log(study_data)
+    for(let round=1; round <= 3; round++){
+        let round_data = study_data.games[round-1].data
+        template_data['round'+round] = {
+            score: {
+                you: round_data.score[0],
+                partner: round_data.score[1],
+                average: 30
+            },
+            give: {
+                you: round_data.agent_coop_count.received,
+                partner: round_data.agent_coop_count.provided,
+                average: 5
+            },
+            take: {
+                you: round_data.agent_coop_count.provided,
+                partner: round_data.agent_coop_count.received,
+                average: 9
+            }
+        }
+    }
+    $("#results").html(templates.results.template({
+        results: template_data
+    }));
+
+    $("#results-footer").html(templates.results_footer.template({
+        //TODO fix this before launching!
+        share_url: "https://cook.moralai.org/litw",
+        share_title: $.i18n('litw-irb-header'),
+        share_text: $.i18n('litw-template-title'),
+        more_litw_studies: [{
+            study_url: "https://reading.labinthewild.org/",
+            study_logo: "http://labinthewild.org/images/reading-assessment.jpg",
+            study_slogan: $.i18n('litw-results-more-study1-slogan'),
+            study_description: $.i18n('litw-results-more-study1-description'),
+        },
+        {
+            study_url: "https://litw-sci-scomm.azurewebsites.net/LITW/consent",
+            study_logo: "http://labinthewild.org/images/sci-comm-img.png",
+            study_slogan: $.i18n('litw-results-more-study2-slogan'),
+            study_description: $.i18n('litw-results-more-study2-description'),
+        }]
+    }));
+    $("#results").i18n();
+    LITW.utils.showSlide("results");
 }
 
 $(function() {
