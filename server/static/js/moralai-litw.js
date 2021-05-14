@@ -52,8 +52,12 @@ let templates = {
         resource: 'static/templates/litw-demographics.html',
         template: null
     },
-    tutorial1: {
-        resource: 'static/templates/litw-tutorial-step1.html',
+    tutorial1_1: {
+        resource: 'static/templates/litw-tutorial-step1_1.html',
+        template: null
+    },
+    tutorial1_2: {
+        resource: 'static/templates/litw-tutorial-step1_2.html',
         template: null
     },
     tutorial2: {
@@ -266,24 +270,31 @@ function load_template(template_name) {
 }
 
 function configure_study() {
+    // study_timeline.push({
+    //     name: "demographics",
+    //     type: "display-slide",
+    //     template: templates.demographics.template,
+    //     display_element: $("#demographics"),
+    //     show_next: false
+    // });
+    // study_timeline.push({
+    //     name: "informed_consent",
+    //     type: "display-slide",
+    //     template: templates.consent.template,
+    //     display_element: $("#informed_consent"),
+    //     show_next: false
+    // });
     study_timeline.push({
-        name: "informed_consent",
+        name: "tutorial1_1",
         type: "display-slide",
-        template: templates.consent.template,
-        display_element: $("#informed_consent"),
-        show_next: false
+        template: templates.tutorial1_1.template,
+        display_element: $("#tutorial"),
+        show_next: true
     });
     study_timeline.push({
-        name: "demographics",
+        name: "tutorial1_2",
         type: "display-slide",
-        template: templates.demographics.template,
-        display_element: $("#demographics"),
-        show_next: false
-    });
-    study_timeline.push({
-        name: "tutorial1",
-        type: "display-slide",
-        template: templates.tutorial1.template,
+        template: templates.tutorial1_2.template,
         display_element: $("#tutorial"),
         show_next: true
     });
