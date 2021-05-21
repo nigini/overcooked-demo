@@ -10,13 +10,13 @@
 
 <br>
 
-<div id="form" style="text-align: left"></div>
+<div id="demographicsForm" style="text-align: left"></div>
 <script type="text/javascript">
     $(document).ready(function() {
         var countries = {};
         $.getJSON('static/templates/i18n/countries-en.json', function(data) { countries = data; }) //TODO: load based on language
         .done( function () {
-                $("#form").alpaca({
+                $("#demographicsForm").alpaca({
                     "data": false,
                     "schema": {
                         "description": "MoralAI - Demographics",
@@ -155,7 +155,7 @@
                     },
                     "postRender": function(control){
                         if( $('body').css('direction') === 'rtl') {
-                            $('#form').css('text-align', 'right');
+                            $('#demographicsForm').css('text-align', 'right');
                         }
 
                         $('#btn-next-page').attr('style','display:none;');

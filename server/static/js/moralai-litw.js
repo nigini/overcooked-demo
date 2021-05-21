@@ -282,7 +282,12 @@ function configure_study() {
         type: "display-slide",
         template: templates.demographics.template,
         display_element: $("#demographics"),
-        show_next: false
+        show_next: false,
+        finish: function(){
+            let form_data = $('#demographicsForm').alpaca().getValue();
+            form_data['time_elapsed'] = getSlideTime();
+            LITW.data.submitDemographics(form_data);
+        }
     });
     study_timeline.push({
         name: "tutorial1_1",
