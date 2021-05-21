@@ -1,35 +1,20 @@
 <div id="results-body">
-    <h2 class="bolded-blue" data-i18n="litw-result-header"></h2>
-    <h3>{{results.message}}</h3>
-    <table class="table">
-        <thead class="thead-dark">
-        <tr>
-            <th scope="col" data-i18n="litw-result-table-t1"></th>
-            <th scope="col" data-i18n="litw-result-table-t2"></th>
-            <th scope="col" data-i18n="litw-result-table-t3"></th>
-            <th scope="col" data-i18n="litw-result-table-t4"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th scope="row" data-i18n="litw-result-table-r1"></th>
-            <td>{{results.round1.score.you}} / {{results.round1.score.partner}} / {{results.round1.score.average}}</td>
-            <td>{{results.round2.score.you}} / {{results.round2.score.partner}} / {{results.round2.score.average}}</td>
-            <td>{{results.round3.score.you}} / {{results.round3.score.partner}} / {{results.round3.score.average}}</td>
-        </tr>
-        <tr>
-            <th scope="row" data-i18n="litw-result-table-r2"></th>
-            <td>{{results.round1.give.you}} / {{results.round1.give.partner}} / {{results.round1.give.average}}</td>
-            <td>{{results.round2.give.you}} / {{results.round2.give.partner}} / {{results.round2.give.average}}</td>
-            <td>{{results.round3.give.you}} / {{results.round3.give.partner}} / {{results.round3.give.average}}</td>
-        </tr>
-        <tr>
-            <th scope="row" data-i18n="litw-result-table-r3"></th>
-            <td>{{results.round1.take.you}} / {{results.round1.take.partner}} / {{results.round1.take.average}}</td>
-            <td>{{results.round2.take.you}} / {{results.round2.take.partner}} / {{results.round2.take.average}}</td>
-            <td>{{results.round3.take.you}} / {{results.round3.take.partner}} / {{results.round3.take.average}}</td>
-        </tr>
-        </tbody>
-    </table>
+    <h3 class="bolded-blue" data-i18n="litw-result-header"></h3>
+    <div style="width: 50%; margin: auto">
+        <h4>{{results.message}}</h4>
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col" data-i18n="litw-result-table-cook"></th>
+                <th scope="col" data-i18n="litw-result-table-coop"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{results.score_p_avg}} / {{results.score_o_avg}}</td>
+                <td>{{results.coop_p_avg}} / {{results.coop_o_avg}}</td>
+            </tr>
+        </table>
+    </div>
 </div>
 <div id="results-footer"></div>

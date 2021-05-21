@@ -145,7 +145,7 @@ def try_create_game(game_name, **kwargs):
     except Exception as e:
         return None, e
     else:
-        print('GOT A VALID GAME: {}'.format(game))
+        #print('GOT A VALID GAME: {}'.format(game))
         GAMES[game.id] = game
         FREE_MAP[game.id] = False
         return game, None
@@ -263,7 +263,7 @@ def  _leave_game(user_id):
 def _create_game(user_id, game_name, params={}):
     game, err = try_create_game(game_name, **params)
     if not game:
-        print("CREATE GAME: {}".format(err))
+        #print("CREATE GAME: {}".format(err))
         emit("creation_failed", { "error" : err.__repr__() })
         return
     spectating = True
@@ -350,7 +350,7 @@ def litw():
 @app.route('/data', methods=['PUT'])
 def save_data():
     data = request.get_json()
-    print(data)
+    #print(data)
     if data:
         if 'user_id' in data and 'data_type' in data:
             if litw_data:
@@ -391,12 +391,12 @@ def on_create(data):
 @socketio.on('join')
 def on_join(data):
     user_id = request.sid
-    print('JOIN: {}'.format(data))
+    #print('JOIN: {}'.format(data))
     with USERS[user_id]:
         create_if_not_found = data.get("create_if_not_found", True)
         # Retrieve current game if one exists
         curr_game = get_curr_game(user_id)
-        print('JOIN GAME: {}'.format(curr_game))
+        #print('JOIN GAME: {}'.format(curr_game))
         if curr_game:
             # Cannot join if currently in a game
             return

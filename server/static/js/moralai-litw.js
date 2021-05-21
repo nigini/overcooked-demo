@@ -270,20 +270,20 @@ function load_template(template_name) {
 }
 
 function configure_study() {
-    // study_timeline.push({
-    //     name: "demographics",
-    //     type: "display-slide",
-    //     template: templates.demographics.template,
-    //     display_element: $("#demographics"),
-    //     show_next: false
-    // });
-    // study_timeline.push({
-    //     name: "informed_consent",
-    //     type: "display-slide",
-    //     template: templates.consent.template,
-    //     display_element: $("#informed_consent"),
-    //     show_next: false
-    // });
+    study_timeline.push({
+        name: "informed_consent",
+        type: "display-slide",
+        template: templates.consent.template,
+        display_element: $("#informed_consent"),
+        show_next: false
+    });
+    study_timeline.push({
+        name: "demographics",
+        type: "display-slide",
+        template: templates.demographics.template,
+        display_element: $("#demographics"),
+        show_next: false
+    });
     study_timeline.push({
         name: "tutorial1_1",
         type: "display-slide",
@@ -352,15 +352,6 @@ function configure_study() {
             LITW.data.submitStudyData(getLastGameData());
         }
     });
-
-    // let privileged = Math.random() >= .5;
-    // study_data.privileged = privileged;
-    // let priv_instruction_key = 'litw-round-2-inst-p2-priv';
-    // let round_2_conf = 'mai_left';
-    // if(!privileged) {
-    //     priv_instruction_key = 'litw-round-2-inst-p2-npriv';
-    //     round_2_conf = 'mai_right';
-    // }
 
     study_timeline.push({
         name: "round2-instructions",
@@ -496,26 +487,26 @@ function showResults(){
         message: $.i18n('litw-result-thanks')
     }
     console.log(study_data)
+    let p_score = 0;
+    let o_score = 0;
+    let p_coop = 0;
+    let o_coop = 0;
     for(let round=1; round <= 3; round++){
         let round_data = study_data.games[round-1].data
-        template_data['round'+round] = {
-            score: {
-                you: round_data.score[0],
-                partner: round_data.score[1],
-                average: 30
-            },
-            give: {
-                you: round_data.agent_coop_count.received,
-                partner: round_data.agent_coop_count.provided,
-                average: 5
-            },
-            take: {
-                you: round_data.agent_coop_count.provided,
-                partner: round_data.agent_coop_count.received,
-                average: 9
-            }
-        }
+        p_score += round_data.score[0];
+        o_score += round_data.score[1];
+        p_coop += round_data.agent_coop_count.received;
+        o_coop += round_data.agent_coop_count.provided;
     }
+    template_data.score_p_avg = Math.floor(p_score/3);
+    template_data.score_o_avg = Math.floor(o_score/3);
+    template_data.coop_p_avg = Math.floor(p_coop/2);
+    template_data.coop_o_avg = Math.floor(o_coop);
+    let supercook = template_data.score_p_avg > template_data.score_o_avg;
+    let supercoop = template_data.coop_p_avg > template_data.coop_o_avg;
+    if(supercook) template_data.message = $.i18n('litw-result-supercook');
+    if(supercoop) template_data.message = $.i18n('litw-result-highfive');
+    if(supercook && supercoop) template_data.message = $.i18n('litw-result-both');
     $("#results").html(templates.results.template({
         results: template_data
     }));
