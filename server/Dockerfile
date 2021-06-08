@@ -39,9 +39,16 @@ COPY ./config.json ./config.json
 
 # Set environment variables that will be used by app.py
 ENV HOST 0.0.0.0
-ENV PORT 5000
 ENV CONF_PATH config.json
+ENV CERTS /etc/certs/
+ENV LOG_ACCESS /var/log/gunicorn/access.log
+ENV LOG_FILE /var/log/gunicorn/output.log
+RUN mkdir /var/log/gunicorn/
+
+EXPOSE 443
+EXPOSE 80
+CMD ./start_server.sh
 
 # Do the thing
-EXPOSE 5000
-CMD ["python", "-u", "app.py"]
+#EXPOSE 5000
+#CMD ["python", "-u", "app.py"]
