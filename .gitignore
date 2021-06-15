@@ -9,5 +9,4 @@ node_modules/
 **/agents/
 config.json
 app.log
-nginx.conf
 .env
