@@ -8,12 +8,10 @@ ARG GRAPHICS
 WORKDIR /app
 
 # Install non-chai dependencies
-
+RUN python3 -m pip install -U pip
 COPY ./requirements.txt ./requirements.txt
-RUN pip install -r requirements.txt --no-cache-dir
-
-# Install eventlet production server if production build
-RUN if [ "$BUILD_ENV" = "production" ] ; then pip install eventlet ; fi
+#RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt
 
 # Clone chai code
 RUN git clone https://github.com/nigini/overcooked_ai.git --branch $OVERCOOKED_BRANCH --single-branch /overcooked_ai
@@ -30,23 +28,20 @@ RUN apt-get update
 RUN apt-get install -y libgl1-mesa-dev
 
 # Copy over remaining files
+COPY ./start_server.sh ./start_server.sh
 COPY ./static ./static
 COPY ./*.py ./
-COPY ./graphics/$GRAPHICS ./static/js/graphics.js
+#COPY ./graphics/$GRAPHICS ./static/js/graphics.js
 COPY ./config.json ./config.json
-
-
 
 # Set environment variables that will be used by app.py
 ENV HOST 0.0.0.0
 ENV CONF_PATH config.json
-ENV CERTS /etc/certs/
 ENV LOG_ACCESS /var/log/gunicorn/access.log
 ENV LOG_FILE /var/log/gunicorn/output.log
 RUN mkdir /var/log/gunicorn/
 
-EXPOSE 443
-EXPOSE 80
+EXPOSE 8080
 CMD ./start_server.sh
 
 # Do the thing

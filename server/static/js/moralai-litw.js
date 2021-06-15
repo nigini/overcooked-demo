@@ -265,7 +265,7 @@ function load_template(template_name) {
 
     return $.get(templates[template_name].resource, function(html){
         templates[template_name].template = Handlebars.compile(html);
-        console.log(`LOADED ${JSON.stringify(templates[template_name].template)}`);
+        // console.log(`LOADED ${JSON.stringify(templates[template_name].template)}`);
     })
 }
 

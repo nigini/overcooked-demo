@@ -9,7 +9,7 @@ if os.getenv('FLASK_ENV', 'production') == 'production':
 import pickle, queue, atexit, json, logging
 from threading import Lock
 from utils import ThreadSafeSet, ThreadSafeDict
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
 from flask_socketio import SocketIO, join_room, leave_room, emit
 from game import OvercookedGame, OvercookedTutorial, Game, CompetitiveOvercooked, LITWOvercooked, \
     LITWTutorial, LITWTutorialCoop
@@ -335,6 +335,11 @@ def get_agent_names():
 ######################
 # Application routes #
 ######################
+
+@app.route("/static/<path:filename>")
+def staticfiles(filename):
+    return send_from_directory(CONFIG["STATIC_FOLDER"], filename)
+
 
 @app.route('/play')
 def index():
