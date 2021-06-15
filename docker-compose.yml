@@ -19,6 +19,9 @@ services:
             context: ./nginx
             args:
                 NGINX_CONF: ${NGINX_CONF}
+                SERVER_NAME: ${SERVER_NAME}
+                SERVER_SSL_CERTIFICATE_KEY: ${SERVER_SSL_CERTIFICATE_KEY}
+                SERVER_SSL_CERTIFICATE_CHAIN: ${SERVER_SSL_CERTIFICATE_CHAIN}
         volumes:
             - ${STATIC_FOLDER}:/var/cook/static/:ro
         ports:
