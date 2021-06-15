@@ -1,6 +1,9 @@
 FROM nginx:1.21-alpine
 
 ARG NGINX_CONF
+ARG SERVER_NAME
+ARG SERVER_SSL_CERTIFICATE_KEY
+ARG SERVER_SSL_CERTIFICATE_CHAIN
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY ./$NGINX_CONF /etc/nginx/conf.d
