@@ -19,12 +19,13 @@ services:
             context: ./nginx
             args:
                 NGINX_CONF: ${NGINX_CONF}
+                NGINX_PORT: ${NGINX_PORT}
                 SERVER_NAME: ${SERVER_NAME}
                 SERVER_SSL_CERTIFICATE_KEY: ${SERVER_SSL_CERTIFICATE_KEY}
                 SERVER_SSL_CERTIFICATE_CHAIN: ${SERVER_SSL_CERTIFICATE_CHAIN}
         volumes:
             - ${STATIC_FOLDER}:/var/cook/static/:ro
         ports:
-            - 80:80
+            - ${NGINX_PORT}:${NGINX_PORT}
         depends_on:
             - cook
