@@ -341,13 +341,7 @@ def staticfiles(filename):
     return send_from_directory(CONFIG["STATIC_FOLDER"], filename)
 
 
-@app.route('/play')
-def index():
-    agent_names = get_agent_names()
-    return render_template('index.html', agent_names=agent_names, layouts=LAYOUTS)
-
-
-@app.route('/litw')
+@app.route('/')
 def litw():
     return render_template('litw.html')
 
