@@ -23,28 +23,27 @@ html, body {
 	/*overflow: hidden*/
 }
 
+.instructions-stim-container {
+	text-align: center;
+}
+
 @media only screen and (min-width: 960px) {
-	.instructions-stim-container {
-		text-align: center;
+	.slide{
+		display: none;
 		width: 800px;
 		margin: 0 auto;
 	}
 
-	#comments {
-		width: 800px;
-		margin: 0 auto;
+	#results{
+		width: 900px;
 	}
 }
 
 @media only screen and (max-width: 960px) {
-	.instructions-stim-container {
-		text-align: center;
-	}
-
-	#comments {
+	.slide{
+		display: none;
 		margin: 0 auto;
-	}
-}
+	}}
 
 /* styles for the entire page */
 body {
@@ -67,10 +66,6 @@ body {
 	margin-top:15px; 
 	font-size: 13px; 
 	color:#888; 
-}
-
-.slide {
-	display: none;
 }
 
 .irb-paragraph {
@@ -249,7 +244,8 @@ textarea.comments-box, textarea.comments_box {
 }
 
 .litw-study-link-img {
-	width: 200px;
+	width: 100%;
+	max-width: 200px;
 }
 .litw-study-link-description {
 }
@@ -545,10 +541,6 @@ select {
 	float: right;
 	cursor: pointer;
 }
-.slide {
-	display: none;
-	margin: 0 auto;
-}
 
 .hoverable:hover {
 	cursor: pointer;
@@ -643,4 +635,9 @@ a:active {
 	padding: 1px;
 	margin: auto;
 	width: 95%;
+}
+
+/** OVERWRITING ALPACA STUFF **/
+.alpaca-container .row {
+	display: block;
 }

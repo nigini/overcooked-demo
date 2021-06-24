@@ -518,18 +518,18 @@ function showResults(){
 
     $("#results-footer").html(templates.results_footer.template({
         //TODO fix this before launching!
-        share_url: "https://cook.moralai.org/litw",
-        share_title: $.i18n('litw-irb-header'),
-        share_text: $.i18n('litw-template-title'),
+        share_url: "https://cook.moralai.org/",
+        share_title: $.i18n('litw-study-title'),
+        share_text: $.i18n('litw-study-description'),
         more_litw_studies: [{
-            study_url: "https://reading.labinthewild.org/",
-            study_logo: "http://labinthewild.org/images/reading-assessment.jpg",
+            study_url: "https://labinthewild.org/studies/wikipedia/",
+            study_logo: "https://labinthewild.org/studies/wikipedia/img/wikipedia-logo.png",
             study_slogan: $.i18n('litw-results-more-study1-slogan'),
             study_description: $.i18n('litw-results-more-study1-description'),
         },
         {
-            study_url: "https://litw-sci-scomm.azurewebsites.net/LITW/consent",
-            study_logo: "http://labinthewild.org/images/sci-comm-img.png",
+            study_url: "http://www.labinthewild.org/studies/formality-security/",
+            study_logo: "http://www.labinthewild.org/images/formality-logo.jpg",
             study_slogan: $.i18n('litw-results-more-study2-slogan'),
             study_description: $.i18n('litw-results-more-study2-description'),
         }]

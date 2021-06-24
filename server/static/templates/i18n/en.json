@@ -6,9 +6,10 @@
     "locale": "en",
     "message-documentation": "qqq"
   },
-  "litw-study-title": "MoralAI: The Overcooked Study",
+  "litw-study-title": "Do too many cooks spoil the stew?",
+  "litw-study-description": "Play this game and check how good you are in cooking and delivering soups. This study takes 10 minutes.",
   "litw-study-loading": "Loading",
-  "litw-irb-header": "Play this cooking game and compare your results with others?",
+  "litw-irb-header": "Do too many cooks spoil the stew?",
   "litw-irb-subheader-1": "Please read the following information carefully before proceeding.",
   "litw-irb-subheader-2": "Note: To take part in this study, you will have to be at least 8 years of age.",
   "litw-irb-body-1-p1": "Why we are doing this research:",
@@ -146,8 +147,8 @@
   "litw-results-more-step2": "Share this study with your friends!",
   "litw-results-more-step3": "And consider participating in some of our other studies:",
   "litw-results-more-participate": "Participate now!",
-  "litw-results-more-study1-slogan": "How well can AI understand your speech?",
-  "litw-results-more-study1-description": "Find out how well AI can understand your speech by reading out loud a few words and sentences! The test takes around 7 minutes.",
-  "litw-results-more-study2-slogan": "Learn to be a better writer!",
-  "litw-results-more-study2-description": "Can you identify the writing strategies of experts? Improve your reading and writing while comparing yourself to experts in this 10 minute study!"
+  "litw-results-more-study1-slogan": "What percentage of Wikipedia do you know?",
+  "litw-results-more-study1-description": "Take a survey on a few Wikipedia articles to see how well and fast you learn things. This study takes 5 minutes.",
+  "litw-results-more-study2-slogan": "Amazon, Apple, Facebook, Google: Can you tell the difference?",
+  "litw-results-more-study2-description": "Test how well you know how big tech talks. This study takes 5 minutes."
 }
