@@ -221,6 +221,7 @@ function disable_key_listener() {
 /* LITW STUDY CONFIGURATION */
 
 function _init_litw(){
+    getStudyDataSummary();
     LITW.data.initialize().then( function () {
         study_data.litw_uuid = LITW.data.getParticipantId();
         study_data.country = LITW.data.getCountry();
@@ -474,6 +475,21 @@ function getSlideTime() {
     }
 }
 
+function getStudyDataSummary() {
+    study_data.averages = {
+        num_rounds: 0,
+        avg_coop: 10,
+        avg_score: 30
+    }
+    console.log("STARTED!")
+    $.getJSON('summary', function (summary){
+        study_data.averages.avg_score = summary.data.average_score;
+        study_data.averages.avg_coop = summary.data.average_coop;
+        study_data.averages.num_rounds = summary.data.total_rounds;
+        console.log('AVERAGES: ' + JSON.stringify(study_data.averages));
+    });
+}
+
 function showResults(){
     if (study_data.games.length < 3){
         //FAKE DATA FOR TESTING
@@ -491,22 +507,17 @@ function showResults(){
     let template_data = {
         message: $.i18n('litw-result-thanks')
     }
-    console.log(study_data)
     let p_score = 0;
-    let o_score = 0;
     let p_coop = 0;
-    let o_coop = 0;
     for(let round=1; round <= 3; round++){
         let round_data = study_data.games[round-1].data
         p_score += round_data.score[0];
-        o_score += round_data.score[1];
-        p_coop += round_data.agent_coop_count.received;
-        o_coop += round_data.agent_coop_count.provided;
+        p_coop += round_data.agent_coop_count.received + round_data.agent_coop_count.provided;
     }
     template_data.score_p_avg = Math.floor(p_score/3);
-    template_data.score_o_avg = Math.floor(o_score/3);
-    template_data.coop_p_avg = Math.floor(p_coop/2);
-    template_data.coop_o_avg = Math.floor(o_coop);
+    template_data.coop_p_avg = Math.floor(p_coop/3);
+    template_data.score_o_avg = Math.floor(study_data.averages.avg_score);
+    template_data.coop_o_avg = Math.floor(study_data.averages.avg_coop);
     let supercook = template_data.score_p_avg > template_data.score_o_avg;
     let supercoop = template_data.coop_p_avg > template_data.coop_o_avg;
     if(supercook) template_data.message = $.i18n('litw-result-supercook');
@@ -517,7 +528,6 @@ function showResults(){
     }));
 
     $("#results-footer").html(templates.results_footer.template({
-        //TODO fix this before launching!
         share_url: "https://cook.moralai.org/",
         share_title: $.i18n('litw-study-title'),
         share_text: $.i18n('litw-study-description'),

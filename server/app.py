@@ -349,7 +349,6 @@ def litw():
 @app.route('/data', methods=['PUT'])
 def save_data():
     data = request.get_json()
-    #print(data)
     if data:
         if 'user_id' in data and 'data_type' in data:
             if litw_data:
@@ -360,6 +359,10 @@ def save_data():
     else:
         return 'Expected JSON data: {user_id: ??, data_type: ??, ...}.', 400
 
+
+@app.route('/summary', methods=['GET'])
+def get_data_summary():
+    return litw_data.get_summary(), 200
 
 
 #########################

@@ -17,7 +17,9 @@
         "url_server": "https://data.labinthewild.org/v1/",
         "url_auth": "auth/?study_id={}&study_key={}",
         "url_data": "study/{}/data/",
+        "url_summary_params": "?selecting_keys={}&filtering_keys={}",
         "study_id": "",
-        "study_key": ""
+        "study_key": "",
+        "summary_lifetime": 86400
     }
 }
