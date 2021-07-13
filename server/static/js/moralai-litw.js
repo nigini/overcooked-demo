@@ -445,19 +445,19 @@ function configure_study() {
         }
     });
 
-    study_timeline.push({
-        name: "download-data",
-        type: "call-function",
-        func: function(){
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(study_data));
-            let downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "study_data.json");
-            document.body.appendChild(downloadAnchorNode); // required for firefox
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-    });
+    // study_timeline.push({
+    //     name: "download-data",
+    //     type: "call-function",
+    //     func: function(){
+    //         let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(study_data));
+    //         let downloadAnchorNode = document.createElement('a');
+    //         downloadAnchorNode.setAttribute("href", dataStr);
+    //         downloadAnchorNode.setAttribute("download", "study_data.json");
+    //         document.body.appendChild(downloadAnchorNode); // required for firefox
+    //         downloadAnchorNode.click();
+    //         downloadAnchorNode.remove();
+    //     }
+    // });
 
     study_timeline.push({
         name: "results",
